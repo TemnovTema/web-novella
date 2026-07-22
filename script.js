@@ -4,7 +4,10 @@ const state = {
   knowsTruth: false,
   sawPhoto: false,
   sawSecondHand: false,
-  current: 'intro',
+  busDeparturePlayed: false,
+  disturbingSoundScenesPlayed: new Set(),
+  canReturnToHallFromCrossroad: false,
+  current: 'busRide',
 };
 
 const inventoryEl = document.getElementById('inventory');
@@ -25,6 +28,11 @@ const playStoryEl = document.getElementById('playStory');
 const playStoryCardEl = document.getElementById('playStoryCard');
 const backToLibraryEl = document.getElementById('backToLibrary');
 const ambientSoundEl = document.getElementById('ambientSound');
+const busDepartureSoundEl = document.getElementById('busDepartureSound');
+const outdoorWindSoundEl = document.getElementById('outdoorWindSound');
+const disturbingRoomSoundEl = document.getElementById('disturbingRoomSound');
+const jumpscareSoundEl = document.getElementById('jumpscareSound');
+const houseCreakSoundEl = document.getElementById('houseCreakSound');
 const soundToggleEl = document.getElementById('soundToggle');
 const soundToggleIconEl = soundToggleEl.querySelector('.sound-toggle__icon');
 const soundToggleLabelEl = soundToggleEl.querySelector('.sound-toggle__label');
@@ -32,8 +40,216 @@ const soundToggleLabelEl = soundToggleEl.querySelector('.sound-toggle__label');
 let typingToken = 0;
 let finishTyping = null;
 let soundEnabled = true;
+let busDepartureFadeTimer = null;
+let busDepartureFadeFrame = null;
+let windFadeFrame = null;
+let windSyncToken = 0;
+const activeDisturbingSounds = new Set();
+const activeJumpscareSounds = new Set();
+const activeHouseCreakSounds = new Set();
+let houseCreakInterval = null;
 
 ambientSoundEl.volume = 0.22;
+busDepartureSoundEl.volume = 0.28;
+outdoorWindSoundEl.volume = 0;
+
+const outdoorScenes = new Set([
+  'intro',
+  'forestRoad',
+  'loopRoad',
+  'approach',
+  'yard',
+  'shed',
+  'window',
+  'letter',
+  'letterReveal',
+  'porch',
+  'doorFalls',
+  'endBad',
+  'endNeutral',
+]);
+
+const disturbingSoundScenes = new Set(['cellar', 'secretRoom']);
+const jumpscareScenes = new Set(['scare', 'endTrust']);
+const indoorHouseScenes = new Set([
+  'hall',
+  'grandmaRoom',
+  'familyPhoto',
+  'cellar',
+  'scare',
+  'crossroad',
+  'secretRoom',
+  'mirrorBroken',
+]);
+
+function playHouseCreak() {
+  if (!soundEnabled || !indoorHouseScenes.has(state.current)) return;
+
+  const sound = houseCreakSoundEl.cloneNode();
+  sound.volume = 0.18;
+  activeHouseCreakSounds.add(sound);
+
+  const releaseSound = () => activeHouseCreakSounds.delete(sound);
+  sound.addEventListener('ended', releaseSound, { once: true });
+  sound.addEventListener('error', releaseSound, { once: true });
+  sound.play().catch(releaseSound);
+}
+
+function stopHouseCreaks() {
+  clearInterval(houseCreakInterval);
+  houseCreakInterval = null;
+  activeHouseCreakSounds.forEach((sound) => {
+    sound.pause();
+    sound.currentTime = 0;
+  });
+  activeHouseCreakSounds.clear();
+}
+
+function syncHouseCreaks(sceneKey) {
+  const shouldRun = soundEnabled && indoorHouseScenes.has(sceneKey);
+
+  if (shouldRun && !houseCreakInterval) {
+    houseCreakInterval = setInterval(playHouseCreak, 30000);
+  } else if (!shouldRun && houseCreakInterval) {
+    stopHouseCreaks();
+  }
+}
+
+function stopJumpscareSounds() {
+  activeJumpscareSounds.forEach((sound) => {
+    sound.pause();
+    sound.currentTime = 0;
+  });
+  activeJumpscareSounds.clear();
+}
+
+function playJumpscareSound() {
+  if (!soundEnabled) return;
+
+  const sound = jumpscareSoundEl.cloneNode();
+  sound.volume = 0.52;
+  activeJumpscareSounds.add(sound);
+
+  const releaseSound = () => activeJumpscareSounds.delete(sound);
+  sound.addEventListener('ended', releaseSound, { once: true });
+  sound.addEventListener('error', releaseSound, { once: true });
+  sound.play().catch(releaseSound);
+}
+
+function stopDisturbingSounds() {
+  activeDisturbingSounds.forEach((sound) => {
+    sound.pause();
+    sound.currentTime = 0;
+  });
+  activeDisturbingSounds.clear();
+}
+
+function playDisturbingSound(sceneKey) {
+  state.disturbingSoundScenesPlayed.add(sceneKey);
+  if (!soundEnabled) return;
+
+  const sound = disturbingRoomSoundEl.cloneNode();
+  sound.volume = 0.34;
+  activeDisturbingSounds.add(sound);
+
+  const releaseSound = () => activeDisturbingSounds.delete(sound);
+  sound.addEventListener('ended', releaseSound, { once: true });
+  sound.addEventListener('error', releaseSound, { once: true });
+  sound.play().catch(releaseSound);
+}
+
+function fadeWindTo(targetVolume, duration = 900, pauseAtEnd = false) {
+  cancelAnimationFrame(windFadeFrame);
+  const startedAt = performance.now();
+  const startingVolume = outdoorWindSoundEl.volume;
+
+  function fadeStep(now) {
+    const progress = Math.min(1, (now - startedAt) / duration);
+    outdoorWindSoundEl.volume = startingVolume + ((targetVolume - startingVolume) * progress);
+
+    if (progress < 1) {
+      windFadeFrame = requestAnimationFrame(fadeStep);
+    } else {
+      windFadeFrame = null;
+      if (pauseAtEnd) outdoorWindSoundEl.pause();
+    }
+  }
+
+  windFadeFrame = requestAnimationFrame(fadeStep);
+}
+
+function stopOutdoorWind(reset = false) {
+  windSyncToken += 1;
+  cancelAnimationFrame(windFadeFrame);
+  windFadeFrame = null;
+  outdoorWindSoundEl.pause();
+  outdoorWindSoundEl.volume = 0;
+  if (reset) outdoorWindSoundEl.currentTime = 0;
+}
+
+function syncOutdoorWind(sceneKey) {
+  const syncToken = ++windSyncToken;
+  const shouldPlay = soundEnabled && outdoorScenes.has(sceneKey);
+
+  if (shouldPlay) {
+    if (outdoorWindSoundEl.paused) {
+      outdoorWindSoundEl.play().then(() => {
+        if (syncToken !== windSyncToken || !outdoorScenes.has(state.current)) {
+          outdoorWindSoundEl.pause();
+          return;
+        }
+        fadeWindTo(0.055, 1200);
+      }).catch(() => {});
+    } else {
+      fadeWindTo(0.055, 600);
+    }
+  } else if (!outdoorWindSoundEl.paused) {
+    fadeWindTo(0, 800, true);
+  }
+}
+
+function stopBusDepartureSound() {
+  clearTimeout(busDepartureFadeTimer);
+  cancelAnimationFrame(busDepartureFadeFrame);
+  busDepartureFadeTimer = null;
+  busDepartureFadeFrame = null;
+  busDepartureSoundEl.pause();
+  busDepartureSoundEl.currentTime = 0;
+  busDepartureSoundEl.volume = 0.28;
+}
+
+function fadeBusDepartureSound() {
+  const fadeDuration = 1600;
+  const startedAt = performance.now();
+  const startingVolume = busDepartureSoundEl.volume;
+
+  function fadeStep(now) {
+    const progress = Math.min(1, (now - startedAt) / fadeDuration);
+    busDepartureSoundEl.volume = startingVolume * (1 - progress);
+
+    if (progress < 1 && !busDepartureSoundEl.paused) {
+      busDepartureFadeFrame = requestAnimationFrame(fadeStep);
+    } else {
+      busDepartureSoundEl.pause();
+      busDepartureSoundEl.volume = 0.28;
+      busDepartureFadeFrame = null;
+    }
+  }
+
+  busDepartureFadeFrame = requestAnimationFrame(fadeStep);
+}
+
+function playBusDepartureSound() {
+  state.busDeparturePlayed = true;
+  if (!soundEnabled) return;
+
+  stopBusDepartureSound();
+  busDepartureSoundEl.play().then(() => {
+    const duration = Number.isFinite(busDepartureSoundEl.duration) ? busDepartureSoundEl.duration : 5.2;
+    const fadeAfter = Math.max(0, (duration - 1.6) * 1000);
+    busDepartureFadeTimer = setTimeout(fadeBusDepartureSound, fadeAfter);
+  }).catch(() => {});
+}
 
 function renderSoundState() {
   soundToggleEl.classList.toggle('is-muted', !soundEnabled);
@@ -51,10 +267,10 @@ function playAmbientSound() {
   });
 }
 
-const sceneOrder = ['intro', 'forestRoad', 'loopRoad', 'approach', 'yard', 'shed', 'window', 'letter', 'letterReveal', 'porch', 'hall', 'grandmaRoom', 'cellar', 'crossroad'];
+const sceneOrder = ['busRide', 'intro', 'forestRoad', 'loopRoad', 'approach', 'yard', 'shed', 'window', 'letter', 'letterReveal', 'porch', 'doorFalls', 'hall', 'grandmaRoom', 'cellar', 'crossroad'];
 
 // Decode scene art before it is needed so a choice never reveals a blank stage.
-['bus-stop-v1.png', 'forest-road-v1.png', 'loop-road-v1.png', 'arrival-v1.png', 'yard-v1.png', 'shed-v1.png', 'window-v1.png', 'porch-v1.png', 'hall-v1.png', 'grandma-room-v1.png', 'family-photo-v1.png', 'letter-v1.png', 'letter-reveal-v1.png', 'cellar-v1.png', 'scare-v1.png', 'scare-bad-v1.png', 'crossroad-v1.png', 'secret-room-v1.png', 'mirror-broken-v1.png', 'end-good-v1.png', 'icon-memory-v1.png', 'house-calm-v1.png', 'end-bad-v1.png', 'end-trust-v1.png'].forEach((file) => {
+['bus-letter-v1.png', 'bus-stop-v1.png', 'forest-road-v1.png', 'loop-road-v1.png', 'arrival-v1.png', 'yard-v1.png', 'shed-v1.png', 'window-v1.png', 'porch-v1.png', 'door-fallen-v1.png', 'hall-v1.png', 'grandma-room-v1.png', 'family-photo-v1.png', 'letter-v1.png', 'letter-reveal-v1.png', 'cellar-v1.png', 'scare-v1.png', 'scare-bad-v1.png', 'crossroad-v1.png', 'secret-room-v1.png', 'mirror-broken-v1.png', 'end-good-v1.png', 'icon-memory-v1.png', 'house-calm-v1.png', 'end-bad-v1.png', 'end-trust-v1.png'].forEach((file) => {
   const image = new Image();
   image.src = `assets/scenes/${file}`;
 });
@@ -68,6 +284,18 @@ const inventoryLabels = {
 };
 
 const scenes = {
+  busRide: {
+    backdrop: 'bus-letter',
+    kicker: 'Пролог',
+    title: 'Письмо',
+    status: 'До конечной осталось сорок минут',
+    text: [
+      'В автобусе не было никого, кроме тебя и водителя. За мокрыми окнами тянулся тёмный лес, изредка разрезанный светом фар.',
+      'Конверт пришёл утром, без обратного адреса. Внутри сухим канцелярским языком сообщалось: бабушка умерла неделю назад. Дом остался заперт, вещи нужно забрать до конца месяца.',
+      'Внизу была короткая приписка от руки: «Она просила, чтобы приехал именно ты». Подписи не было.'
+    ],
+    choices: [{ title: 'Сложить письмо', hint: 'Автобус уже замедляется', next: 'intro' }],
+  },
   intro: {
     backdrop: 'bus-stop',
     kicker: 'Пролог',
@@ -248,10 +476,22 @@ const scenes = {
       {
         title: 'Постучать',
         hint: 'Попросить дом ответить самому',
-        next: 'endTrust',
+        next: 'doorFalls',
       },
       { title: 'Назад во двор', hint: 'Еще не поздно осмотреться', next: 'yard' },
     ],
+  },
+  doorFalls: {
+    backdrop: 'door-fallen',
+    kicker: 'Ответ',
+    title: 'Дверь',
+    status: 'Никто не подошёл с той стороны',
+    text: [
+      'Ты постучал три раза. За дверью что-то тихо щёлкнуло.',
+      'После третьего стука дверь открылась сама. Не распахнулась — полотно медленно накренилось внутрь и легло на пол целиком, будто петли просто перестали его помнить.',
+      'Удара не было. Из открывшейся прихожей бабушкин голос негромко сказал: «Заходи».'
+    ],
+    choices: [{ title: 'Переступить порог', hint: 'Дом уже ответил', next: 'endTrust' }],
   },
   hall: {
     backdrop: 'hall',
@@ -341,6 +581,7 @@ const scenes = {
       {
         title: 'Подняться наверх',
         hint: state.items.has('faith') ? 'Сохранить себя' : 'Уйти, пока можешь',
+        effect: () => { state.canReturnToHallFromCrossroad = true; },
         next: 'scare',
       },
     ],
@@ -379,6 +620,13 @@ const scenes = {
         hint: 'В стене есть ещё одна дверь',
         next: 'secretRoom',
         showIf: () => state.knowsTruth && state.sawSecondHand,
+      },
+      {
+        title: 'Вернуться в коридор',
+        hint: 'Сначала осмотреть комнату бабушки',
+        effect: () => { state.canReturnToHallFromCrossroad = false; },
+        next: 'hall',
+        showIf: () => state.canReturnToHallFromCrossroad,
       },
     ],
   },
@@ -620,9 +868,9 @@ function goTo(sceneKey) {
   titleEl.innerHTML = scene.title.replace(/\n/g, '<br>');
 
   const orderIndex = sceneOrder.indexOf(sceneKey);
-  const displayIndex = orderIndex >= 0 ? orderIndex : scene.ending ? 14 : 0;
+  const displayIndex = orderIndex >= 0 ? orderIndex : scene.ending ? sceneOrder.length : 0;
   sceneIndexEl.textContent = String(displayIndex).padStart(2, '0');
-  progressBarEl.style.width = `${Math.max(7, ((displayIndex + 1) / 15) * 100)}%`;
+  progressBarEl.style.width = `${Math.max(7, ((displayIndex + 1) / (sceneOrder.length + 1)) * 100)}%`;
   progressLabelEl.textContent = `${scene.kicker} · ${String(displayIndex).padStart(2, '0')}`;
 
   if (!pickupEl.hidden && !['yard', 'letter'].includes(sceneKey)) {
@@ -632,6 +880,12 @@ function goTo(sceneKey) {
   typeText(scene.text);
   renderChoices(scene);
   restartEl.hidden = !scene.ending;
+  syncOutdoorWind(sceneKey);
+  syncHouseCreaks(sceneKey);
+
+  if (jumpscareScenes.has(sceneKey)) {
+    playJumpscareSound();
+  }
 
   if (sceneKey === 'scare') {
     setTimeout(() => {
@@ -646,6 +900,14 @@ function goTo(sceneKey) {
       document.body.classList.add('is-bad-ending-fade');
     }, 1000);
   }
+
+  if (sceneKey === 'intro' && !state.busDeparturePlayed) {
+    playBusDepartureSound();
+  }
+
+  if (disturbingSoundScenes.has(sceneKey) && !state.disturbingSoundScenesPlayed.has(sceneKey)) {
+    playDisturbingSound(sceneKey);
+  }
 }
 
 function resetGame() {
@@ -654,9 +916,16 @@ function resetGame() {
   state.knowsTruth = false;
   state.sawPhoto = false;
   state.sawSecondHand = false;
+  state.busDeparturePlayed = false;
+  state.disturbingSoundScenesPlayed = new Set();
+  state.canReturnToHallFromCrossroad = false;
+  stopBusDepartureSound();
+  stopDisturbingSounds();
+  stopJumpscareSounds();
+  stopHouseCreaks();
   renderInventory();
   hidePickup();
-  goTo('intro');
+  goTo('busRide');
 }
 
 function startStory() {
@@ -676,6 +945,11 @@ function openLibrary() {
   document.body.classList.add('is-library-open');
   ambientSoundEl.pause();
   ambientSoundEl.currentTime = 0;
+  stopBusDepartureSound();
+  stopOutdoorWind(true);
+  stopDisturbingSounds();
+  stopJumpscareSounds();
+  stopHouseCreaks();
   window.scrollTo({ top: 0, behavior: 'auto' });
   playStoryEl.focus({ preventScroll: true });
 }
@@ -690,8 +964,15 @@ soundToggleEl.addEventListener('click', () => {
 
   if (soundEnabled) {
     playAmbientSound();
+    syncOutdoorWind(state.current);
+    syncHouseCreaks(state.current);
   } else {
     ambientSoundEl.pause();
+    stopBusDepartureSound();
+    stopOutdoorWind();
+    stopDisturbingSounds();
+    stopJumpscareSounds();
+    stopHouseCreaks();
   }
 });
 textEl.addEventListener('click', () => finishTyping?.());
@@ -723,4 +1004,4 @@ document.addEventListener('keydown', (event) => {
 
 renderInventory();
 renderSoundState();
-goTo('intro');
+goTo('busRide');
