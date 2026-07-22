@@ -33,6 +33,7 @@ const outdoorWindSoundEl = document.getElementById('outdoorWindSound');
 const disturbingRoomSoundEl = document.getElementById('disturbingRoomSound');
 const jumpscareSoundEl = document.getElementById('jumpscareSound');
 const houseCreakSoundEl = document.getElementById('houseCreakSound');
+const femaleCrySoundEl = document.getElementById('femaleCrySound');
 const soundToggleEl = document.getElementById('soundToggle');
 const soundToggleIconEl = soundToggleEl.querySelector('.sound-toggle__icon');
 const soundToggleLabelEl = soundToggleEl.querySelector('.sound-toggle__label');
@@ -48,6 +49,8 @@ const activeDisturbingSounds = new Set();
 const activeJumpscareSounds = new Set();
 const activeHouseCreakSounds = new Set();
 let houseCreakInterval = null;
+const activeFemaleCries = new Set();
+let femaleCryInterval = null;
 
 ambientSoundEl.volume = 0.22;
 busDepartureSoundEl.volume = 0.28;
@@ -72,6 +75,8 @@ const outdoorScenes = new Set([
 const disturbingSoundScenes = new Set(['cellar', 'secretRoom']);
 const jumpscareScenes = new Set(['scare', 'endTrust']);
 const indoorHouseScenes = new Set([
+  'wetCoat',
+  'coatLetter',
   'hall',
   'grandmaRoom',
   'familyPhoto',
@@ -81,6 +86,39 @@ const indoorHouseScenes = new Set([
   'secretRoom',
   'mirrorBroken',
 ]);
+
+function playFemaleCry(volume = 0.065) {
+  if (!soundEnabled) return;
+
+  const sound = femaleCrySoundEl.cloneNode();
+  sound.volume = volume;
+  activeFemaleCries.add(sound);
+
+  const releaseSound = () => activeFemaleCries.delete(sound);
+  sound.addEventListener('ended', releaseSound, { once: true });
+  sound.addEventListener('error', releaseSound, { once: true });
+  sound.play().catch(releaseSound);
+}
+
+function stopFemaleCries() {
+  clearInterval(femaleCryInterval);
+  femaleCryInterval = null;
+  activeFemaleCries.forEach((sound) => {
+    sound.pause();
+    sound.currentTime = 0;
+  });
+  activeFemaleCries.clear();
+}
+
+function syncIndoorCrying(sceneKey) {
+  const shouldRun = soundEnabled && indoorHouseScenes.has(sceneKey);
+
+  if (shouldRun && !femaleCryInterval) {
+    femaleCryInterval = setInterval(() => playFemaleCry(0.065), 20000);
+  } else if (!shouldRun && femaleCryInterval) {
+    stopFemaleCries();
+  }
+}
 
 function playHouseCreak() {
   if (!soundEnabled || !indoorHouseScenes.has(state.current)) return;
@@ -267,10 +305,10 @@ function playAmbientSound() {
   });
 }
 
-const sceneOrder = ['busRide', 'intro', 'forestRoad', 'loopRoad', 'approach', 'yard', 'shed', 'window', 'letter', 'letterReveal', 'porch', 'doorFalls', 'hall', 'grandmaRoom', 'cellar', 'crossroad'];
+const sceneOrder = ['busRide', 'intro', 'forestRoad', 'loopRoad', 'approach', 'yard', 'shed', 'window', 'letter', 'letterReveal', 'porch', 'doorFalls', 'wetCoat', 'hall', 'grandmaRoom', 'cellar', 'crossroad'];
 
 // Decode scene art before it is needed so a choice never reveals a blank stage.
-['bus-letter-v1.png', 'bus-stop-v1.png', 'forest-road-v1.png', 'loop-road-v1.png', 'arrival-v1.png', 'yard-v1.png', 'shed-v1.png', 'window-v1.png', 'porch-v1.png', 'door-fallen-v1.png', 'hall-v1.png', 'grandma-room-v1.png', 'family-photo-v1.png', 'letter-v1.png', 'letter-reveal-v1.png', 'cellar-v1.png', 'scare-v1.png', 'scare-bad-v1.png', 'crossroad-v1.png', 'secret-room-v1.png', 'mirror-broken-v1.png', 'end-good-v1.png', 'icon-memory-v1.png', 'house-calm-v1.png', 'end-bad-v1.png', 'end-trust-v1.png'].forEach((file) => {
+['bus-letter-v1.png', 'bus-stop-v1.png', 'forest-road-v1.png', 'loop-road-v1.png', 'arrival-v1.png', 'yard-v1.png', 'shed-v1.png', 'window-v1.png', 'porch-v1.png', 'door-fallen-v1.png', 'wet-coat-v1.png', 'hall-v1.png', 'grandma-room-v1.png', 'family-photo-v1.png', 'letter-v1.png', 'letter-reveal-v1.png', 'cellar-v1.png', 'scare-v1.png', 'scare-bad-v1.png', 'crossroad-v1.png', 'secret-room-v1.png', 'mirror-broken-v1.png', 'end-good-v1.png', 'icon-memory-v1.png', 'house-calm-v1.png', 'end-bad-v1.png', 'end-trust-v1.png'].forEach((file) => {
   const image = new Image();
   image.src = `assets/scenes/${file}`;
 });
@@ -491,7 +529,34 @@ const scenes = {
       'После третьего стука дверь открылась сама. Не распахнулась — полотно медленно накренилось внутрь и легло на пол целиком, будто петли просто перестали его помнить.',
       'Удара не было. Из открывшейся прихожей бабушкин голос негромко сказал: «Заходи».'
     ],
-    choices: [{ title: 'Переступить порог', hint: 'Дом уже ответил', next: 'endTrust' }],
+    choices: [{ title: 'Переступить порог', hint: 'Дом уже ответил', next: 'wetCoat' }],
+  },
+  wetCoat: {
+    backdrop: 'wet-coat',
+    kicker: 'Внутри',
+    title: 'Мокрые\nследы',
+    status: 'Ты всё ещё стоишь в своём пальто',
+    text: [
+      'На первом же гвозде висело мокрое пальто. Твоё — тот же цвет, та же надорванная петля у воротника.',
+      'Ты коснулся собственного плеча. Пальто всё ещё было на тебе.',
+      'От вещи по коридору тянулись свежие следы босых ног. Левая ступня была чуть развёрнута внутрь — совсем как твоя.'
+    ],
+    choices: [
+      { title: 'Осмотреть пальто', hint: 'Проверить внутренний карман', next: 'coatLetter' },
+      { title: 'Не прикасаться', hint: 'Пройти дальше по коридору', next: 'hall' },
+    ],
+  },
+  coatLetter: {
+    backdrop: 'wet-coat',
+    kicker: 'Находка',
+    title: 'Копия',
+    status: 'На этот раз письмо ничего не просит',
+    text: [
+      'Во внутреннем кармане лежало письмо из автобуса. Совпадали все сгибы, потёртый угол и тёмное пятно от большого пальца.',
+      'Ты проверил свой карман. Оригинал был там.',
+      'Копия оставалась совершенно сухой, хотя с пальто продолжала капать вода.'
+    ],
+    choices: [{ title: 'Вернуть письмо в карман', hint: 'Не брать с собой ещё одну невозможную вещь', next: 'hall' }],
   },
   hall: {
     backdrop: 'hall',
@@ -882,6 +947,11 @@ function goTo(sceneKey) {
   restartEl.hidden = !scene.ending;
   syncOutdoorWind(sceneKey);
   syncHouseCreaks(sceneKey);
+  syncIndoorCrying(sceneKey);
+
+  if (sceneKey === 'endNeutral') {
+    playFemaleCry(0.22);
+  }
 
   if (jumpscareScenes.has(sceneKey)) {
     playJumpscareSound();
@@ -923,6 +993,7 @@ function resetGame() {
   stopDisturbingSounds();
   stopJumpscareSounds();
   stopHouseCreaks();
+  stopFemaleCries();
   renderInventory();
   hidePickup();
   goTo('busRide');
@@ -950,6 +1021,7 @@ function openLibrary() {
   stopDisturbingSounds();
   stopJumpscareSounds();
   stopHouseCreaks();
+  stopFemaleCries();
   window.scrollTo({ top: 0, behavior: 'auto' });
   playStoryEl.focus({ preventScroll: true });
 }
@@ -966,6 +1038,7 @@ soundToggleEl.addEventListener('click', () => {
     playAmbientSound();
     syncOutdoorWind(state.current);
     syncHouseCreaks(state.current);
+    syncIndoorCrying(state.current);
   } else {
     ambientSoundEl.pause();
     stopBusDepartureSound();
@@ -973,6 +1046,7 @@ soundToggleEl.addEventListener('click', () => {
     stopDisturbingSounds();
     stopJumpscareSounds();
     stopHouseCreaks();
+    stopFemaleCries();
   }
 });
 textEl.addEventListener('click', () => finishTyping?.());

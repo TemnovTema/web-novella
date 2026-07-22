@@ -81,6 +81,7 @@
 /* Close porch view: the door carries restrained fingernail marks. */
 .backdrop[data-scene="porch"]{background-image:url('assets/scenes/porch-v1.png');background-position:center}
 .backdrop[data-scene="door-fallen"]{background-image:url('assets/scenes/door-fallen-v1.png');background-position:center}
+.backdrop[data-scene="wet-coat"]{background-image:url('assets/scenes/wet-coat-v1.png');background-position:center}
 
 /* Hidden handwriting reveal with a subtle watcher behind the glass. */
 .backdrop[data-scene="letter-reveal"]{background-image:url('assets/scenes/letter-reveal-v1.png');background-position:center}
