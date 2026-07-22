@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Назови меня бабушкой — интерактивная хоррор-новелла</title>
+  <meta name="description" content="Интерактивная хоррор-новелла о бабушкином доме, чужом голосе и памяти, которая не хочет умирать." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="is-library-open">
+  <a class="skip-link" href="#story">К истории</a>
+  <div class="noise"></div>
+
+  <div class="library" id="library">
+    <section class="library-hero" aria-labelledby="libraryTitle">
+      <div class="library-hero__art" aria-hidden="true"></div>
+      <div class="library-hero__shade" aria-hidden="true"></div>
+      <div class="library-nav">
+        <div class="library-mark">СТРАШНЫЕ <span>ИСТОРИИ</span></div>
+        <a href="#stories">Репертуар · 04</a>
+      </div>
+      <div class="library-hero__content">
+        <div class="library-hero__eyebrow">Интерактивный хоррор · выпуск 01</div>
+        <h1 id="libraryTitle">Здесь история<br>слушает тебя</h1>
+        <p>Ты попал в собрание страшных историй, где решения меняют происходящее. Читай, выбирай и помни: иногда игра замечает выбор раньше тебя.</p>
+        <button class="library-play" id="playStory" type="button">
+          <span>Сыграть в историю</span>
+          <i>Назови меня бабушкой · 8–10 минут</i>
+        </button>
+      </div>
+      <a class="library-scroll" href="#stories">Смотреть истории <span>↓</span></a>
+    </section>
+
+    <section class="story-library" id="stories" aria-labelledby="storiesTitle">
+      <div class="story-library__head">
+        <div>
+          <span>Репертуар</span>
+          <h2 id="storiesTitle">Выбери историю</h2>
+        </div>
+        <p>Каждая история занимает один вечер.<br>Не каждая заканчивается утром.</p>
+      </div>
+
+      <div class="story-grid">
+        <article class="story-tile story-tile--active">
+          <div class="story-tile__cover story-cover--grandma" role="img" aria-label="Заброшенный дом у дороги в ночном лесу"></div>
+          <div class="story-tile__number">01</div>
+          <div class="story-tile__body">
+            <span class="story-tile__state">Доступно сейчас</span>
+            <h3>Назови меня<br>бабушкой</h3>
+            <p>На смятом письме стоит дата — через три дня после смерти бабушки. В её доме всё ещё горит свет, а голос за стеной знает твоё имя.</p>
+            <button class="story-tile__play" id="playStoryCard" type="button">Начать историю <span>→</span></button>
+          </div>
+        </article>
+
+        <article class="story-tile story-tile--soon">
+          <div class="story-tile__cover story-cover--station" role="img" aria-label="Пустой тёмный коридор старой станции"></div>
+          <div class="story-tile__number">02</div>
+          <div class="story-tile__body">
+            <span class="story-tile__state">В разработке</span>
+            <h3>Последняя<br>станция</h3>
+            <p>Ночной поезд остановился там, где станции нет ни на одной карте.</p>
+          </div>
+        </article>
+
+        <article class="story-tile story-tile--soon">
+          <div class="story-tile__cover story-cover--well" role="img" aria-label="Каменный подвал со спуском во тьму"></div>
+          <div class="story-tile__number">03</div>
+          <div class="story-tile__body">
+            <span class="story-tile__state">В разработке</span>
+            <h3>Глубже<br>колодца</h3>
+            <p>Каждую ночь из пустого колодца звонят на телефон пропавшего отца.</p>
+          </div>
+        </article>
+
+        <article class="story-tile story-tile--soon">
+          <div class="story-tile__cover story-cover--room" role="img" aria-label="Старая комната с фотографиями и зеркалом"></div>
+          <div class="story-tile__number">04</div>
+          <div class="story-tile__body">
+            <span class="story-tile__state">В разработке</span>
+            <h3>Комната<br>без двери</h3>
+            <p>На семейной фотографии появилась комната, которой вчера ещё не было.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <header class="hud">
+    <div class="brand">Назови меня <span>бабушкой</span><button class="library-return" id="backToLibrary" type="button">← истории</button></div>
+    <div class="chapter-progress" aria-label="Прогресс по истории">
+      <span id="progressLabel">Пролог · 00</span>
+      <div class="chapter-progress__track"><i id="progressBar"></i></div>
+    </div>
+    <div class="inventory" id="inventory"></div>
+  </header>
+
+  <main class="stage">
+    <div class="backdrop" id="backdrop"></div>
+    <div class="vignette"></div>
+    <div class="lines"></div>
+
+    <div class="scene-index" aria-hidden="true" id="sceneIndex">00</div>
+    <section class="scene-card" id="story">
+      <div class="scene-meta">
+        <span class="scene-kicker" id="kicker">Пролог</span>
+        <span class="scene-status" id="status">Состояние меняется по ходу пьесы</span>
+      </div>
+
+      <h1 class="scene-title" id="title">Назови меня бабушкой</h1>
+      <div class="scene-text" id="text" tabindex="0" aria-live="polite"></div>
+
+      <div class="pickup" id="pickup" hidden>
+        <div class="pickup__label">Найдено</div>
+        <div class="pickup__name" id="pickupName"></div>
+        <div class="pickup__desc" id="pickupDesc"></div>
+      </div>
+
+      <div class="choices" id="choices"></div>
+      <button class="restart" id="restart" hidden>Начать заново</button>
+      <div class="continue-hint">Enter — показать текст <span>·</span> 1–9 — выбрать действие</div>
+    </section>
+  </main>
+
+  <aside class="orientation-gate" role="dialog" aria-modal="true" aria-labelledby="orientationTitle">
+    <div class="orientation-gate__phone" aria-hidden="true"><i></i></div>
+    <div class="orientation-gate__eyebrow">для лучшего обзора</div>
+    <h2 id="orientationTitle">Поверните<br>телефон</h2>
+    <p>Эта история играется в горизонтальном формате.</p>
+    <span class="orientation-gate__line" aria-hidden="true"></span>
+  </aside>
+
+  <script src="script.js"></script>
+</body>
+</html>
