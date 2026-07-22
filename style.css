@@ -215,8 +215,7 @@
     "meta choices"
     "title choices"
     "text choices"
-    "pickup choices"
-    "hint choices";
+    "pickup choices";
   column-gap:clamp(36px,6vw,92px);
   row-gap:7px;
   padding:20px 22px 17px 25px;
