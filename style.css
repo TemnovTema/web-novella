@@ -378,3 +378,18 @@
 @media(max-width:760px){.library-hero{padding:100px 22px 74px}.library-hero h1{font-size:clamp(54px,18vw,82px)}.library-hero__content>p{font-size:18px}.library-scroll{display:none}.story-library{padding:72px 18px 80px}.story-library__head{display:block}.story-library__head p{margin-top:20px;text-align:left}.story-grid{grid-template-columns:1fr}.story-tile__cover{height:72vw}.story-tile__body{min-height:220px}}
 
 @media(prefers-reduced-motion:reduce){.library-hero__art{animation:none}}
+
+/* In-game soundtrack controls */
+.hud-actions{display:flex;align-items:center;justify-content:flex-end;gap:14px;min-width:0}
+.sound-toggle{display:flex;align-items:center;gap:7px;padding:6px 8px;border:1px solid rgba(241,237,229,.14);background:rgba(5,7,9,.58);color:rgba(241,237,229,.62);font-size:8px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:color .2s ease,border-color .2s ease,background .2s ease}
+.sound-toggle:hover,.sound-toggle:focus-visible{border-color:rgba(198,169,109,.58);background:rgba(198,169,109,.09);color:var(--text);outline:none}
+.sound-toggle:focus-visible{box-shadow:0 0 0 2px rgba(198,169,109,.22)}
+.sound-toggle__icon{display:grid;width:12px;height:12px;place-items:center;color:var(--accent);font-size:14px;line-height:1}
+.sound-toggle.is-muted{color:rgba(241,237,229,.34)}
+.sound-toggle.is-muted .sound-toggle__icon{color:rgba(241,237,229,.38)}
+
+@media(max-width:950px) and (orientation:landscape){
+  .hud-actions{gap:7px}
+  .sound-toggle{padding:5px 6px;font-size:7px}
+  .sound-toggle__label{display:none}
+}

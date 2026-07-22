@@ -13,6 +13,7 @@
 <body class="is-library-open">
   <a class="skip-link" href="#story">К истории</a>
   <div class="noise"></div>
+  <audio id="ambientSound" src="assets/audio/attic-memory.mp3" loop preload="auto"></audio>
 
   <div class="library" id="library">
     <section class="library-hero" aria-labelledby="libraryTitle">
@@ -94,7 +95,13 @@
       <span id="progressLabel">Пролог · 00</span>
       <div class="chapter-progress__track"><i id="progressBar"></i></div>
     </div>
-    <div class="inventory" id="inventory"></div>
+    <div class="hud-actions">
+      <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="true" aria-label="Выключить музыку">
+        <span class="sound-toggle__icon" aria-hidden="true">◖</span>
+        <span class="sound-toggle__label">Звук</span>
+      </button>
+      <div class="inventory" id="inventory"></div>
+    </div>
   </header>
 
   <main class="stage">

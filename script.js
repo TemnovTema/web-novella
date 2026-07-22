@@ -24,9 +24,32 @@ const progressLabelEl = document.getElementById('progressLabel');
 const playStoryEl = document.getElementById('playStory');
 const playStoryCardEl = document.getElementById('playStoryCard');
 const backToLibraryEl = document.getElementById('backToLibrary');
+const ambientSoundEl = document.getElementById('ambientSound');
+const soundToggleEl = document.getElementById('soundToggle');
+const soundToggleIconEl = soundToggleEl.querySelector('.sound-toggle__icon');
+const soundToggleLabelEl = soundToggleEl.querySelector('.sound-toggle__label');
 
 let typingToken = 0;
 let finishTyping = null;
+let soundEnabled = true;
+
+ambientSoundEl.volume = 0.22;
+
+function renderSoundState() {
+  soundToggleEl.classList.toggle('is-muted', !soundEnabled);
+  soundToggleEl.setAttribute('aria-pressed', String(soundEnabled));
+  soundToggleEl.setAttribute('aria-label', soundEnabled ? 'Выключить музыку' : 'Включить музыку');
+  soundToggleIconEl.textContent = soundEnabled ? '◖' : '×';
+  soundToggleLabelEl.textContent = soundEnabled ? 'Звук' : 'Без звука';
+}
+
+function playAmbientSound() {
+  if (!soundEnabled) return;
+  ambientSoundEl.play().catch(() => {
+    soundEnabled = false;
+    renderSoundState();
+  });
+}
 
 const sceneOrder = ['intro', 'forestRoad', 'loopRoad', 'approach', 'yard', 'shed', 'window', 'letter', 'letterReveal', 'porch', 'hall', 'grandmaRoom', 'cellar', 'crossroad'];
 
@@ -638,6 +661,10 @@ function resetGame() {
 
 function startStory() {
   document.body.classList.remove('is-library-open');
+  soundEnabled = true;
+  ambientSoundEl.currentTime = 0;
+  renderSoundState();
+  playAmbientSound();
   resetGame();
   textEl.focus({ preventScroll: true });
 }
@@ -647,6 +674,8 @@ function openLibrary() {
   finishTyping = null;
   document.body.classList.remove('is-scare', 'is-bad-ending-intro', 'is-bad-ending-fade');
   document.body.classList.add('is-library-open');
+  ambientSoundEl.pause();
+  ambientSoundEl.currentTime = 0;
   window.scrollTo({ top: 0, behavior: 'auto' });
   playStoryEl.focus({ preventScroll: true });
 }
@@ -655,6 +684,16 @@ restartEl.addEventListener('click', resetGame);
 playStoryEl.addEventListener('click', startStory);
 playStoryCardEl.addEventListener('click', startStory);
 backToLibraryEl.addEventListener('click', openLibrary);
+soundToggleEl.addEventListener('click', () => {
+  soundEnabled = !soundEnabled;
+  renderSoundState();
+
+  if (soundEnabled) {
+    playAmbientSound();
+  } else {
+    ambientSoundEl.pause();
+  }
+});
 textEl.addEventListener('click', () => finishTyping?.());
 textEl.addEventListener('keydown', (event) => {
   if ((event.key === 'Enter' || event.key === ' ') && finishTyping) {
@@ -683,4 +722,5 @@ document.addEventListener('keydown', (event) => {
 });
 
 renderInventory();
+renderSoundState();
 goTo('intro');
