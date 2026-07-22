@@ -35,7 +35,6 @@ const jumpscareSoundEl = document.getElementById('jumpscareSound');
 const houseCreakSoundEl = document.getElementById('houseCreakSound');
 const femaleCrySoundEl = document.getElementById('femaleCrySound');
 const soundToggleEl = document.getElementById('soundToggle');
-const soundToggleIconEl = soundToggleEl.querySelector('.sound-toggle__icon');
 const soundToggleLabelEl = soundToggleEl.querySelector('.sound-toggle__label');
 
 let typingToken = 0;
@@ -293,7 +292,6 @@ function renderSoundState() {
   soundToggleEl.classList.toggle('is-muted', !soundEnabled);
   soundToggleEl.setAttribute('aria-pressed', String(soundEnabled));
   soundToggleEl.setAttribute('aria-label', soundEnabled ? 'Выключить музыку' : 'Включить музыку');
-  soundToggleIconEl.textContent = soundEnabled ? '◖' : '×';
   soundToggleLabelEl.textContent = soundEnabled ? 'Звук' : 'Без звука';
 }
 
