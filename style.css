@@ -1,6 +1,6 @@
 :root{--ink:#080a0d;--text:#f1ede5;--muted:rgba(241,237,229,.58);--line:rgba(241,237,229,.18);--accent:#c6a96d;--panel:rgba(8,10,13,.7)}
 *{box-sizing:border-box}html{scroll-behavior:smooth}html,body{margin:0;min-height:100%;background:var(--ink);color:var(--text);font-family:"Manrope",system-ui,sans-serif}body{overflow:hidden}button{font:inherit}.skip-link{position:fixed;z-index:50;top:12px;left:12px;transform:translateY(-150%);padding:10px 14px;background:var(--text);color:var(--ink)}.skip-link:focus{transform:none}
-.noise,.vignette,.lines,.backdrop{position:absolute;inset:0;pointer-events:none}.noise{z-index:3;opacity:.055;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.9'/%3E%3C/svg%3E");mix-blend-mode:screen}.stage{position:relative;min-height:100dvh;display:grid;align-items:end;padding:clamp(92px,12vh,138px) clamp(24px,6vw,96px) clamp(30px,6vh,64px);isolation:isolate}.backdrop{z-index:0;background-image:url('assets/scenes/arrival-v1.png');background-size:cover;background-position:center;transform:scale(1.025);transition:filter .8s ease,transform 1.2s cubic-bezier(.2,.7,.2,1),background-position 1s ease}.backdrop[data-scene="yard"]{background-position:60% center;filter:brightness(.82) saturate(.75)}.backdrop[data-scene="window"]{background-position:76% center;filter:brightness(.62) saturate(.7)}.backdrop[data-scene="porch"],.backdrop[data-scene="hall"]{background-position:88% center;filter:brightness(.48) saturate(.55)}.backdrop[data-scene="letter"],.backdrop[data-scene="cellar"],.backdrop[data-scene="crossroad"]{filter:brightness(.34) saturate(.45) blur(2px);transform:scale(1.06)}.backdrop[data-scene^="end-"]{filter:grayscale(.65) brightness(.28);transform:scale(1.08)}.vignette{z-index:1;background:linear-gradient(90deg,rgba(4,6,8,.96) 0%,rgba(4,6,8,.78) 28%,rgba(4,6,8,.15) 68%,rgba(4,6,8,.42) 100%),linear-gradient(0deg,rgba(4,6,8,.82),transparent 48%)}.lines{z-index:2;background:linear-gradient(90deg,transparent 49.96%,rgba(255,255,255,.05) 50%,transparent 50.04%);opacity:.3}
+.noise,.vignette,.lines,.backdrop{position:absolute;inset:0;pointer-events:none}.noise{z-index:3;opacity:.055;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.9'/%3E%3C/svg%3E");mix-blend-mode:screen}.stage{position:relative;min-height:100dvh;display:grid;align-items:end;padding:clamp(92px,12vh,138px) clamp(24px,6vw,96px) clamp(30px,6vh,64px);isolation:isolate}.backdrop{z-index:0;background-image:url('assets/scenes/arrival-v1.webp');background-size:cover;background-position:center;transform:scale(1.025);transition:filter .8s ease,transform 1.2s cubic-bezier(.2,.7,.2,1),background-position 1s ease}.backdrop[data-scene="yard"]{background-position:60% center;filter:brightness(.82) saturate(.75)}.backdrop[data-scene="window"]{background-position:76% center;filter:brightness(.62) saturate(.7)}.backdrop[data-scene="porch"],.backdrop[data-scene="hall"]{background-position:88% center;filter:brightness(.48) saturate(.55)}.backdrop[data-scene="letter"],.backdrop[data-scene="cellar"],.backdrop[data-scene="crossroad"]{filter:brightness(.34) saturate(.45) blur(2px);transform:scale(1.06)}.backdrop[data-scene^="end-"]{filter:grayscale(.65) brightness(.28);transform:scale(1.08)}.vignette{z-index:1;background:linear-gradient(90deg,rgba(4,6,8,.96) 0%,rgba(4,6,8,.78) 28%,rgba(4,6,8,.15) 68%,rgba(4,6,8,.42) 100%),linear-gradient(0deg,rgba(4,6,8,.82),transparent 48%)}.lines{z-index:2;background:linear-gradient(90deg,transparent 49.96%,rgba(255,255,255,.05) 50%,transparent 50.04%);opacity:.3}
 .hud{position:fixed;inset:0 0 auto;z-index:10;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:22px clamp(24px,4vw,64px);border-bottom:1px solid rgba(255,255,255,.08);background:linear-gradient(rgba(5,7,9,.58),transparent);backdrop-filter:blur(2px)}.brand{font-family:"Cormorant Garamond",serif;font-size:21px;letter-spacing:.07em}.brand span{color:var(--accent);font-style:italic}.chapter-progress{width:min(28vw,320px);text-align:center;color:var(--muted);font-size:9px;letter-spacing:.22em;text-transform:uppercase}.chapter-progress__track{height:1px;margin-top:9px;background:rgba(255,255,255,.14)}.chapter-progress__track i{display:block;width:8%;height:100%;background:var(--accent);box-shadow:0 0 12px rgba(198,169,109,.55);transition:width .6s ease}.inventory{display:flex;justify-content:flex-end;gap:12px}.inventory__item{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}.inventory__item:not(:only-child)::before{content:'◇';margin-right:6px;color:var(--accent)}
 .scene-index{position:absolute;z-index:2;right:clamp(24px,5vw,80px);bottom:10px;font-family:"Cormorant Garamond",serif;font-size:clamp(130px,22vw,340px);line-height:.75;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.075);user-select:none}.scene-card{position:relative;z-index:5;width:min(760px,62vw);display:flex;flex-direction:column;gap:18px;padding-left:clamp(16px,2vw,30px);border-left:1px solid rgba(198,169,109,.55)}.scene-card::before{content:'';position:absolute;left:-3px;top:0;width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px var(--accent)}.scene-meta{display:flex;align-items:center;gap:18px;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}.scene-kicker{color:var(--accent)}.scene-status::before{content:'—';margin-right:18px}.scene-title{margin:0;max-width:11ch;font-family:"Cormorant Garamond",serif;font-size:clamp(54px,7.2vw,104px);font-weight:500;line-height:.82;letter-spacing:-.045em;text-wrap:balance;text-shadow:0 2px 40px rgba(0,0,0,.5)}.scene-text{max-width:610px;min-height:128px;font-family:"Cormorant Garamond",serif;font-size:clamp(19px,1.65vw,24px);line-height:1.45;color:rgba(241,237,229,.86);cursor:pointer;outline:none}.scene-text:focus-visible{box-shadow:0 0 0 1px var(--accent)}.scene-text p{margin:0 0 .45em}.cursor{color:var(--accent);animation:blink 1s step-end infinite}@keyframes blink{50%{opacity:0}}
 .choices{display:grid;grid-template-columns:repeat(2,minmax(210px,1fr));gap:1px;max-width:700px;background:var(--line);border:1px solid var(--line)}.choice{position:relative;min-height:78px;padding:14px 48px 14px 16px;border:0;background:rgba(8,10,13,.72);color:var(--text);text-align:left;cursor:pointer;transition:background .22s ease,color .22s ease}.choice::after{content:'↗';position:absolute;right:17px;top:17px;color:var(--accent);transition:transform .22s ease}.choice:hover,.choice:focus-visible{z-index:1;background:rgba(198,169,109,.16);outline:1px solid rgba(198,169,109,.62)}.choice:hover::after{transform:translate(2px,-2px)}.choice:active{transform:scale(.985)}.choice:disabled{cursor:not-allowed;opacity:.38}.choice:disabled::after{content:'—'}.choice__title{display:block;margin-bottom:5px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}.choice__hint{display:block;font-family:"Cormorant Garamond",serif;font-size:15px;line-height:1.25;color:var(--muted)}.pickup{max-width:610px;padding:14px 16px;background:rgba(198,169,109,.1);border-top:1px solid rgba(198,169,109,.35)}.pickup__label{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}.pickup__name{margin:3px 0;font-family:"Cormorant Garamond",serif;font-size:22px}.pickup__desc{font-size:12px;line-height:1.5;color:var(--muted)}.restart{align-self:flex-start;padding:13px 18px;border:1px solid var(--accent);background:rgba(8,10,13,.7);color:var(--text);cursor:pointer}.continue-hint{font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.34)}.continue-hint span{margin:0 8px;color:var(--accent)}
@@ -8,39 +8,39 @@
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
 /* Scene art direction: chapter two */
-.backdrop[data-scene="window"]{background-image:url('assets/scenes/window-v1.png');background-position:center;filter:brightness(.72) saturate(.72)}
-.backdrop[data-scene="letter"]{background-image:url('assets/scenes/window-v1.png');background-position:70% center;filter:brightness(.38) saturate(.48) blur(2px);transform:scale(1.06)}
-.backdrop[data-scene="hall"]{background-image:url('assets/scenes/hall-v1.png');background-position:center;filter:brightness(.76) saturate(.68)}
-.backdrop[data-scene="cellar"]{background-image:url('assets/scenes/hall-v1.png');background-position:82% center;filter:brightness(.32) saturate(.4);transform:scale(1.055)}
-.backdrop[data-scene="crossroad"]{background-image:url('assets/scenes/hall-v1.png');background-position:68% center;filter:brightness(.42) saturate(.48) blur(1px);transform:scale(1.04)}
+.backdrop[data-scene="window"]{background-image:url('assets/scenes/window-v1.webp');background-position:center;filter:brightness(.72) saturate(.72)}
+.backdrop[data-scene="letter"]{background-image:url('assets/scenes/window-v1.webp');background-position:70% center;filter:brightness(.38) saturate(.48) blur(2px);transform:scale(1.06)}
+.backdrop[data-scene="hall"]{background-image:url('assets/scenes/hall-v1.webp');background-position:center;filter:brightness(.76) saturate(.68)}
+.backdrop[data-scene="cellar"]{background-image:url('assets/scenes/hall-v1.webp');background-position:82% center;filter:brightness(.32) saturate(.4);transform:scale(1.055)}
+.backdrop[data-scene="crossroad"]{background-image:url('assets/scenes/hall-v1.webp');background-position:68% center;filter:brightness(.42) saturate(.48) blur(1px);transform:scale(1.04)}
 
 /* Scene art direction: chapter three */
-.backdrop[data-scene="letter"]{background-image:url('assets/scenes/letter-v1.png');background-position:center;filter:brightness(.72) saturate(.7);transform:scale(1.025)}
-.backdrop[data-scene="cellar"]{background-image:url('assets/scenes/cellar-v1.png');background-position:center;filter:brightness(.68) saturate(.62);transform:scale(1.025)}
+.backdrop[data-scene="letter"]{background-image:url('assets/scenes/letter-v1.webp');background-position:center;filter:brightness(.72) saturate(.7);transform:scale(1.025)}
+.backdrop[data-scene="cellar"]{background-image:url('assets/scenes/cellar-v1.webp');background-position:center;filter:brightness(.68) saturate(.62);transform:scale(1.025)}
 
 /* Scene art direction: chapter four */
-.backdrop[data-scene="crossroad"]{background-image:url('assets/scenes/crossroad-v1.png');background-position:center;filter:brightness(.7) saturate(.68);transform:scale(1.025)}
-.backdrop[data-scene="end-good"]{background-image:url('assets/scenes/end-good-v1.png');background-position:center;filter:brightness(.78) saturate(.58);transform:scale(1.025)}
+.backdrop[data-scene="crossroad"]{background-image:url('assets/scenes/crossroad-v1.webp');background-position:center;filter:brightness(.7) saturate(.68);transform:scale(1.025)}
+.backdrop[data-scene="end-good"]{background-image:url('assets/scenes/end-good-v1.webp');background-position:center;filter:brightness(.78) saturate(.58);transform:scale(1.025)}
 
 /* Scene art direction: final chapter */
-.backdrop[data-scene="end-bad"]{background-image:url('assets/scenes/end-bad-v1.png');background-position:center;filter:brightness(.65) saturate(.42);transform:scale(1.025)}
-.backdrop[data-scene="end-trust"]{background-image:url('assets/scenes/end-trust-v1.png');background-position:center;filter:brightness(.62) saturate(.5);transform:scale(1.025)}
+.backdrop[data-scene="end-bad"]{background-image:url('assets/scenes/end-bad-v1.webp');background-position:center;filter:brightness(.65) saturate(.42);transform:scale(1.025)}
+.backdrop[data-scene="end-trust"]{background-image:url('assets/scenes/end-trust-v1.webp');background-position:center;filter:brightness(.62) saturate(.5);transform:scale(1.025)}
 
 /* Expanded story scenes */
-.backdrop[data-scene="shed"]{background-image:url('assets/scenes/shed-v1.png');background-position:center;filter:brightness(.72) saturate(.62);transform:scale(1.025)}
-.backdrop[data-scene="grandma-room"]{background-image:url('assets/scenes/grandma-room-v1.png');background-position:center;filter:brightness(.72) saturate(.66);transform:scale(1.025)}
+.backdrop[data-scene="shed"]{background-image:url('assets/scenes/shed-v1.webp');background-position:center;filter:brightness(.72) saturate(.62);transform:scale(1.025)}
+.backdrop[data-scene="grandma-room"]{background-image:url('assets/scenes/grandma-room-v1.webp');background-position:center;filter:brightness(.72) saturate(.66);transform:scale(1.025)}
 
 /* Memory clue and the single full jumpscare */
-.backdrop[data-scene="family-photo"]{background-image:url('assets/scenes/family-photo-v1.png');background-position:center;filter:brightness(.76) saturate(.6);transform:scale(1.025)}
-.backdrop[data-scene="scare"]{background-image:url('assets/scenes/scare-v1.png');background-position:center;filter:brightness(.86) saturate(.35) contrast(1.12);transform:scale(1.01)}
+.backdrop[data-scene="family-photo"]{background-image:url('assets/scenes/family-photo-v1.webp');background-position:center;filter:brightness(.76) saturate(.6);transform:scale(1.025)}
+.backdrop[data-scene="scare"]{background-image:url('assets/scenes/scare-v1.webp');background-position:center;filter:brightness(.86) saturate(.35) contrast(1.12);transform:scale(1.01)}
 .is-scare .hud,.is-scare .scene-card,.is-scare .scene-index{opacity:0!important;transition:none}
 .is-scare .vignette{background:radial-gradient(circle at 62% 46%,transparent 20%,rgba(0,0,0,.58) 100%)}
 .is-scare .stage{animation:scare-hit 620ms steps(2,end)}
 @keyframes scare-hit{0%{filter:brightness(3)}12%{filter:brightness(.25)}28%{filter:brightness(1.2)}100%{filter:brightness(.7)}}
 
 /* Hidden route and the two non-bad outcomes */
-.backdrop[data-scene="secret-room"],.backdrop[data-scene="end-good"]{background-image:url('assets/scenes/secret-room-v1.png');background-position:center;filter:brightness(.72) saturate(.68);transform:scale(1.025)}
-.backdrop[data-scene="end-neutral"]{background-image:url('assets/scenes/end-good-v1.png');background-position:center;filter:brightness(.78) saturate(.58);transform:scale(1.025)}
+.backdrop[data-scene="secret-room"],.backdrop[data-scene="end-good"]{background-image:url('assets/scenes/secret-room-v1.webp');background-position:center;filter:brightness(.72) saturate(.68);transform:scale(1.025)}
+.backdrop[data-scene="end-neutral"]{background-image:url('assets/scenes/end-good-v1.webp');background-position:center;filter:brightness(.78) saturate(.58);transform:scale(1.025)}
 
 /* Restrained story typography: keep the artwork visible */
 .scene-card{width:min(640px,52vw);gap:14px;padding-left:22px}
@@ -71,23 +71,23 @@
 }
 
 /* Opening landscape before the existing approach shot. */
-.backdrop[data-scene="bus-letter"]{background-image:url('assets/scenes/bus-letter-v1.png');background-position:center}
-.backdrop[data-scene="bus-stop"]{background-image:url('assets/scenes/bus-stop-v1.png');background-position:center}
+.backdrop[data-scene="bus-letter"]{background-image:url('assets/scenes/bus-letter-v1.webp');background-position:center}
+.backdrop[data-scene="bus-stop"]{background-image:url('assets/scenes/bus-stop-v1.webp');background-position:center}
 .choices:has(.choice:only-child){grid-template-columns:minmax(260px,1fr);max-width:310px}
 
 /* Close yard view with all three explorable landmarks. */
-.backdrop[data-scene="yard"]{background-image:url('assets/scenes/yard-v1.png');background-position:center}
+.backdrop[data-scene="yard"]{background-image:url('assets/scenes/yard-v1.webp');background-position:center}
 
 /* Close porch view: the door carries restrained fingernail marks. */
-.backdrop[data-scene="porch"]{background-image:url('assets/scenes/porch-v1.png');background-position:center}
-.backdrop[data-scene="door-fallen"]{background-image:url('assets/scenes/door-fallen-v1.png');background-position:center}
-.backdrop[data-scene="wet-coat"]{background-image:url('assets/scenes/wet-coat-v1.png');background-position:center}
+.backdrop[data-scene="porch"]{background-image:url('assets/scenes/porch-v1.webp');background-position:center}
+.backdrop[data-scene="door-fallen"]{background-image:url('assets/scenes/door-fallen-v1.webp');background-position:center}
+.backdrop[data-scene="wet-coat"]{background-image:url('assets/scenes/wet-coat-v1.webp');background-position:center}
 
 /* Hidden handwriting reveal with a subtle watcher behind the glass. */
-.backdrop[data-scene="letter-reveal"]{background-image:url('assets/scenes/letter-reveal-v1.png');background-position:center}
+.backdrop[data-scene="letter-reveal"]{background-image:url('assets/scenes/letter-reveal-v1.webp');background-position:center}
 
 /* Bad ending: one hard image, then a long fade into text-only black. */
-.backdrop[data-scene="bad-scare"]{background-image:url('assets/scenes/scare-bad-v1.png');background-position:center;opacity:1}
+.backdrop[data-scene="bad-scare"]{background-image:url('assets/scenes/scare-bad-v1.webp');background-position:center;opacity:1}
 .is-bad-ending-intro .hud,.is-bad-ending-intro .scene-card,.is-bad-ending-intro .scene-index{opacity:0!important;transition:none}
 .is-bad-ending-intro .vignette{background:radial-gradient(circle at 58% 46%,transparent 16%,rgba(0,0,0,.42) 100%)}
 .is-bad-ending-intro .stage{animation:bad-scare-hit 1s steps(2,end)}
@@ -97,16 +97,16 @@
 @keyframes bad-scare-hit{0%{filter:brightness(2.4)}10%{filter:brightness(.32)}22%{filter:brightness(1.08)}100%{filter:brightness(.8)}}
 
 /* Three-beat good ending: consequence, escape, final distant view. */
-.backdrop[data-scene="mirror-broken"]{background-image:url('assets/scenes/mirror-broken-v1.png');background-position:center}
-.backdrop[data-scene="good-exit"]{background-image:url('assets/scenes/end-good-v1.png');background-position:center}
-.backdrop[data-scene="end-good"]{background-image:url('assets/scenes/house-calm-v1.png');background-position:center}
+.backdrop[data-scene="mirror-broken"]{background-image:url('assets/scenes/mirror-broken-v1.webp');background-position:center}
+.backdrop[data-scene="good-exit"]{background-image:url('assets/scenes/end-good-v1.webp');background-position:center}
+.backdrop[data-scene="end-good"]{background-image:url('assets/scenes/house-calm-v1.webp');background-position:center}
 
 /* Optional spatial trap before approaching the house. */
-.backdrop[data-scene="forest-road"]{background-image:url('assets/scenes/forest-road-v1.png');background-position:center}
-.backdrop[data-scene="loop-road"]{background-image:url('assets/scenes/loop-road-v1.png');background-position:center}
+.backdrop[data-scene="forest-road"]{background-image:url('assets/scenes/forest-road-v1.webp');background-position:center}
+.backdrop[data-scene="loop-road"]{background-image:url('assets/scenes/loop-road-v1.webp');background-position:center}
 
 /* Optional final memory carried out of the house. */
-.backdrop[data-scene="icon-memory"]{background-image:url('assets/scenes/icon-memory-v1.png');background-position:center}
+.backdrop[data-scene="icon-memory"]{background-image:url('assets/scenes/icon-memory-v1.webp');background-position:center}
 
 /* Mobile orientation gate */
 .orientation-gate{display:none}
@@ -333,7 +333,7 @@
 .is-library-open>.hud,.is-library-open>.stage{display:none}
 .is-library-open>.library{display:block}
 .library-hero{position:relative;min-height:100dvh;overflow:hidden;display:flex;align-items:flex-end;padding:120px clamp(28px,7vw,112px) clamp(66px,9vh,96px)}
-.library-hero__art{position:absolute;inset:0;background:url('assets/scenes/bus-stop-v1.png') center/cover no-repeat;transform:scale(1.015);animation:library-breathe 14s ease-in-out infinite alternate}
+.library-hero__art{position:absolute;inset:0;background:url('assets/scenes/bus-stop-v1.webp') center/cover no-repeat;transform:scale(1.015);animation:library-breathe 14s ease-in-out infinite alternate}
 .library-hero__shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,7,9,.94) 0%,rgba(5,7,9,.68) 38%,rgba(5,7,9,.08) 75%),linear-gradient(0deg,rgba(5,7,9,.72),transparent 48%),radial-gradient(circle at 73% 43%,transparent 0,rgba(5,7,9,.12) 42%,rgba(5,7,9,.44) 100%)}
 .library-nav{position:absolute;z-index:2;inset:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:24px clamp(28px,4vw,64px);font-size:8px;letter-spacing:.2em;text-transform:uppercase}
 .library-mark{padding-left:12px;border-left:2px solid var(--accent);font-weight:700}.library-mark span{color:var(--accent)}
@@ -354,7 +354,7 @@
 .story-grid{position:relative;max-width:1380px;margin:auto;display:grid;grid-template-columns:1.35fr repeat(3,1fr);gap:1px;background:rgba(241,237,229,.12);border:1px solid rgba(241,237,229,.12)}
 .story-tile{position:relative;min-width:0;background:#0a0c0f;overflow:hidden}
 .story-tile__cover{position:relative;height:clamp(250px,33vw,490px);background-position:center;background-size:cover;transition:transform .8s cubic-bezier(.2,.7,.2,1),filter .5s ease}
-.story-cover--grandma{background-image:url('assets/scenes/yard-v1.png')}.story-cover--station{background-image:url('assets/scenes/hall-v1.png')}.story-cover--well{background-image:url('assets/scenes/cellar-v1.png')}.story-cover--room{background-image:url('assets/scenes/grandma-room-v1.png')}
+.story-cover--grandma{background-image:url('assets/scenes/yard-v1.webp')}.story-cover--station{background-image:url('assets/scenes/hall-v1.webp')}.story-cover--well{background-image:url('assets/scenes/cellar-v1.webp')}.story-cover--room{background-image:url('assets/scenes/grandma-room-v1.webp')}
 .story-tile--soon .story-tile__cover{filter:grayscale(.72) brightness(.55)}.story-tile:hover .story-tile__cover{transform:scale(1.025)}.story-tile--soon:hover .story-tile__cover{filter:grayscale(.42) brightness(.68)}
 .story-tile__cover::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,#0a0c0f 0,transparent 42%)}
 .story-tile__number{position:absolute;top:12px;right:13px;color:rgba(241,237,229,.55);font-size:8px;letter-spacing:.15em}
@@ -386,4 +386,67 @@
   .hud-actions{gap:7px}
   .sound-toggle{padding:5px 6px;font-size:7px}
   .sound-toggle__label{display:none}
+}
+
+/* Mobile patch: the library stays portrait-friendly; rotation is requested only in-game. */
+@media(max-width:900px) and (orientation:portrait){
+  body.is-library-open{overflow-x:hidden;overflow-y:auto}
+  body.is-library-open>.library{display:block;visibility:visible}
+  body.is-library-open>.noise{visibility:visible}
+  body.is-library-open>.orientation-gate{display:none}
+
+  .library-hero{min-height:100svh;align-items:flex-end;padding:88px 20px 46px}
+  .library-hero__art{background-position:68% center}
+  .library-nav{padding:18px 20px}
+  .library-hero__eyebrow{margin-bottom:12px;font-size:7px}
+  .library-hero h1{max-width:9ch;font-size:clamp(48px,16vw,68px);line-height:.8}
+  .library-hero__content>p{max-width:36ch;margin:22px 0 24px;font-size:16px;line-height:1.42}
+  .library-play{width:100%;min-width:0;padding:13px 48px 13px 15px}
+  .story-library{padding-top:62px}
+  .story-library__head{margin-bottom:28px}
+  .story-library__head h2{font-size:44px}
+}
+
+/* Compact visual-novel UI for phones held horizontally. */
+@media(max-width:950px) and (orientation:landscape) and (max-height:600px){
+  .hud{inset:6px 10px auto;grid-template-columns:auto minmax(110px,160px) 1fr;gap:10px}
+  .brand{padding:5px 7px 6px;font-size:11px}
+  .library-return{margin-top:3px;font-size:5px}
+  .chapter-progress{gap:7px;font-size:6px}
+  .chapter-progress__track{margin:0}
+  .hud-actions{gap:5px}
+  .sound-toggle{padding:4px 5px}
+  .inventory{max-width:27vw;gap:4px;overflow:hidden}
+  .inventory__item{font-size:5.5px;white-space:nowrap}
+
+  .stage{padding:38px 8px 6px}
+  .scene-index{display:none}
+  .scene-card{width:100%;max-width:none;max-height:calc(100dvh - 44px);grid-template-columns:minmax(0,1fr) minmax(210px,43vw);column-gap:12px;row-gap:3px;padding:7px 8px 6px 10px}
+  .scene-card::before{top:8px;height:18px}
+  .scene-meta{gap:7px;font-size:6px}
+  .scene-status{display:none}
+  .scene-title{margin:0;font-size:clamp(21px,6.2vh,29px);line-height:.88}
+  .scene-text{min-height:34px;max-height:18vh;padding-right:5px;font-size:11.5px;line-height:1.27}
+  .scene-text p{margin-bottom:.18em}
+
+  .choices::before{display:none}
+  .choice{min-height:34px;padding:5px 24px 5px 29px}
+  .choice::before{left:5px;top:9px;font-size:7px}
+  .choice::after{right:6px;top:7px;font-size:16px}
+  .choice:hover,.choice:focus-visible{padding-left:33px}
+  .choice__title{margin-bottom:1px;font-size:7px}
+  .choice__hint{font-size:8.5px;line-height:1.12}
+
+  .pickup{margin-top:2px;padding:5px 7px}
+  .pickup__label{font-size:5px}
+  .pickup__name{margin:1px 0;font-size:13px}
+  .pickup__desc{font-size:7px;line-height:1.25}
+  .restart{padding:9px 11px;font-size:9px}
+}
+
+@media(max-width:700px) and (orientation:landscape) and (max-height:380px){
+  .scene-card{grid-template-columns:minmax(0,1fr) minmax(200px,45vw)}
+  .scene-text{max-height:15vh;font-size:10.5px}
+  .choice{min-height:31px}
+  .choice__hint{display:none}
 }

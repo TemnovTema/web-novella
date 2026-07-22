@@ -7,6 +7,7 @@ const state = {
   busDeparturePlayed: false,
   disturbingSoundScenesPlayed: new Set(),
   canReturnToHallFromCrossroad: false,
+  previousScene: null,
   current: 'busRide',
 };
 
@@ -305,11 +306,41 @@ function playAmbientSound() {
 
 const sceneOrder = ['busRide', 'intro', 'forestRoad', 'loopRoad', 'approach', 'yard', 'shed', 'window', 'letter', 'letterReveal', 'porch', 'doorFalls', 'wetCoat', 'hall', 'grandmaRoom', 'cellar', 'crossroad'];
 
-// Decode scene art before it is needed so a choice never reveals a blank stage.
-['bus-letter-v1.png', 'bus-stop-v1.png', 'forest-road-v1.png', 'loop-road-v1.png', 'arrival-v1.png', 'yard-v1.png', 'shed-v1.png', 'window-v1.png', 'porch-v1.png', 'door-fallen-v1.png', 'wet-coat-v1.png', 'hall-v1.png', 'grandma-room-v1.png', 'family-photo-v1.png', 'letter-v1.png', 'letter-reveal-v1.png', 'cellar-v1.png', 'scare-v1.png', 'scare-bad-v1.png', 'crossroad-v1.png', 'secret-room-v1.png', 'mirror-broken-v1.png', 'end-good-v1.png', 'icon-memory-v1.png', 'house-calm-v1.png', 'end-bad-v1.png', 'end-trust-v1.png'].forEach((file) => {
-  const image = new Image();
-  image.src = `assets/scenes/${file}`;
-});
+const sceneAssetExceptions = {
+  arrival: 'arrival-v1.webp',
+  'good-exit': 'end-good-v1.webp',
+  'end-neutral': 'end-good-v1.webp',
+  'end-good': 'house-calm-v1.webp',
+  'bad-scare': 'scare-bad-v1.webp',
+};
+const preloadedSceneAssets = new Set();
+
+function getSceneAssetUrl(backdrop) {
+  const file = sceneAssetExceptions[backdrop] || `${backdrop}-v1.webp`;
+  return `assets/scenes/${file}`;
+}
+
+function preloadUpcomingScenes(sceneKey, scene) {
+  const schedule = window.requestIdleCallback || ((callback) => setTimeout(callback, 180));
+
+  schedule(() => {
+    const nextSceneKeys = getChoices(scene).map((choice) => choice.next);
+    if (sceneKey === 'scare') nextSceneKeys.push('crossroad');
+
+    nextSceneKeys.forEach((nextSceneKey) => {
+      const nextScene = scenes[nextSceneKey];
+      if (!nextScene) return;
+
+      const url = getSceneAssetUrl(nextScene.backdrop);
+      if (preloadedSceneAssets.has(url)) return;
+
+      preloadedSceneAssets.add(url);
+      const image = new Image();
+      image.decoding = 'async';
+      image.src = url;
+    });
+  }, { timeout: 800 });
+}
 
 const inventoryLabels = {
   key: 'Ключ',
@@ -561,10 +592,35 @@ const scenes = {
     kicker: 'Сцена V',
     title: 'Прихожая',
     status: 'Внутри холоднее, чем снаружи',
-    text: [
-      'Ключ повернулся без сопротивления. Будто замок давно ждал именно тебя.',
-      'Внутри пахло воском, сыростью и чем-то сладковато-гнилым. В глубине коридора вниз уходила лестница. Чуть дальше, за полуоткрытой дверью, виднелась развилка проходов.'
-    ],
+    text: () => {
+      if (state.previousScene === 'coatLetter') {
+        return [
+          'Ты вернул копию письма в карман мокрого пальто. Ткань сразу провисла сильнее, будто с другой стороны кармана кто-то принял его из твоих рук.',
+          'Когда ты отвернулся, за спиной раздался ещё один влажный шаг. Следы на полу стали длиннее ровно на одну ступню.',
+          'В глубине прихожей вниз уходила лестница. Чуть дальше темнела дверь бабушкиной комнаты, а за ней коридор расходился надвое.'
+        ];
+      }
+
+      if (state.previousScene === 'wetCoat') {
+        return [
+          'Ты прошёл мимо пальто, стараясь не смотреть на следы. Позади вода продолжала капать, хотя сквозняка в доме не было.',
+          'На третьем шаге к звуку капель добавился ещё один — тихий, босой шаг по мокрым доскам. Ты не обернулся.',
+          'В глубине прихожей вниз уходила лестница. Чуть дальше темнела дверь бабушкиной комнаты, а за ней коридор расходился надвое.'
+        ];
+      }
+
+      if (state.previousScene === 'porch') {
+        return [
+          'Ключ повернулся без сопротивления. Будто замок давно ждал именно тебя.',
+          'Внутри пахло воском, сыростью и чем-то сладковато-гнилым. В глубине коридора вниз уходила лестница. Чуть дальше, за полуоткрытой дверью, виднелась развилка проходов.'
+        ];
+      }
+
+      return [
+        'Ты снова оказался в прихожей. Теперь она казалась уже, а потолок — немного ниже, хотя ты не мог объяснить, что именно изменилось.',
+        'Лестница в подвал темнела справа. Дверь бабушкиной комнаты оставалась приоткрытой, а в глубине дома по-прежнему ждала развилка.'
+      ];
+    },
     choices: [
       {
         title: 'Осмотреть комнату',
@@ -918,6 +974,7 @@ function renderChoices(scene) {
 }
 
 function goTo(sceneKey) {
+  state.previousScene = state.current;
   state.current = sceneKey;
   const scene = scenes[sceneKey];
 
@@ -940,8 +997,9 @@ function goTo(sceneKey) {
     hidePickup();
   }
 
-  typeText(scene.text);
+  typeText(typeof scene.text === 'function' ? scene.text() : scene.text);
   renderChoices(scene);
+  preloadUpcomingScenes(sceneKey, scene);
   restartEl.hidden = !scene.ending;
   syncOutdoorWind(sceneKey);
   syncHouseCreaks(sceneKey);
@@ -987,6 +1045,8 @@ function resetGame() {
   state.busDeparturePlayed = false;
   state.disturbingSoundScenesPlayed = new Set();
   state.canReturnToHallFromCrossroad = false;
+  state.previousScene = null;
+  state.current = null;
   stopBusDepartureSound();
   stopDisturbingSounds();
   stopJumpscareSounds();
