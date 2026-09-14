@@ -95,6 +95,23 @@
     </section>
   </div>
 
+  <aside class="sound-intro" id="soundIntro" role="dialog" aria-modal="true" aria-labelledby="soundIntroTitle" aria-describedby="soundIntroDescription" hidden>
+    <button class="sound-intro__backdrop" id="soundIntroBackdrop" type="button" aria-label="Закрыть окно"></button>
+    <div class="sound-intro__panel">
+      <div class="sound-intro__eyebrow">Перед началом</div>
+      <h2 id="soundIntroTitle">Эту историю<br>лучше услышать</h2>
+      <p id="soundIntroDescription">Музыка, ветер и звуки дома меняются вместе со сценами. Иногда тишину прерывают резкие звуки и едва слышные голоса.</p>
+      <p class="sound-intro__note">Рекомендуем наушники и умеренную громкость.</p>
+      <div class="sound-intro__actions">
+        <button class="sound-intro__enable" id="enableStorySound" type="button">
+          <span>Включить звук</span>
+          <i>Рекомендуется</i>
+        </button>
+        <button class="sound-intro__mute" id="startStoryMuted" type="button">Продолжить без звука</button>
+      </div>
+    </div>
+  </aside>
+
   <header class="hud">
     <div class="brand">Назови меня <span>бабушкой</span><button class="library-return" id="backToLibrary" type="button">← истории</button></div>
     <div class="chapter-progress" aria-label="Прогресс по истории">
@@ -102,7 +119,7 @@
       <div class="chapter-progress__track"><i id="progressBar"></i></div>
     </div>
     <div class="hud-actions">
-      <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="true" aria-label="Выключить музыку">
+      <button class="sound-toggle is-muted" id="soundToggle" type="button" aria-pressed="false" aria-label="Включить музыку">
         <span class="sound-toggle__icon" aria-hidden="true"></span>
         <span class="sound-toggle__label">Звук</span>
       </button>
