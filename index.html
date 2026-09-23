@@ -62,13 +62,14 @@
           </div>
         </article>
 
-        <article class="story-tile story-tile--soon">
-          <div class="story-tile__cover story-cover--station" role="img" aria-label="Пустой тёмный коридор старой станции"></div>
+        <article class="story-tile story-tile--active">
+          <div class="story-tile__cover story-cover--fifth-photo" role="img" aria-label="Семья переезжает в старый дом на окраине города"></div>
           <div class="story-tile__number">02</div>
           <div class="story-tile__body">
-            <span class="story-tile__state">В разработке</span>
-            <h3>Последняя<br>станция</h3>
-            <p>Ночной поезд остановился там, где станции нет ни на одной карте.</p>
+            <span class="story-tile__state">Черновая версия</span>
+            <h3>Пятый на<br>фотографии</h3>
+            <p>После переезда Лера замечает в доме ребёнка, которого не могло быть рядом. Пока история собрана без финального текста и звука.</p>
+            <button class="story-tile__play" id="playFifthPhotoCard" type="button">Открыть черновик <span>→</span></button>
           </div>
         </article>
 
@@ -113,7 +114,7 @@
   </aside>
 
   <header class="hud">
-    <div class="brand">Назови меня <span>бабушкой</span><button class="library-return" id="backToLibrary" type="button">← истории</button></div>
+    <div class="brand"><span id="storyBrand">Назови меня <em>бабушкой</em></span><button class="library-return" id="backToLibrary" type="button">← истории</button></div>
     <div class="chapter-progress" aria-label="Прогресс по истории">
       <span id="progressLabel">Пролог · 00</span>
       <div class="chapter-progress__track"><i id="progressBar"></i></div>
@@ -132,7 +133,6 @@
     <div class="vignette"></div>
     <div class="lines"></div>
 
-    <div class="scene-index" aria-hidden="true" id="sceneIndex">00</div>
     <section class="scene-card" id="story">
       <div class="scene-meta">
         <span class="scene-kicker" id="kicker">Пролог</span>

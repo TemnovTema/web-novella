@@ -22,12 +22,13 @@ const pickupEl = document.getElementById('pickup');
 const pickupNameEl = document.getElementById('pickupName');
 const pickupDescEl = document.getElementById('pickupDesc');
 const restartEl = document.getElementById('restart');
-const sceneIndexEl = document.getElementById('sceneIndex');
 const progressBarEl = document.getElementById('progressBar');
 const progressLabelEl = document.getElementById('progressLabel');
 const playStoryEl = document.getElementById('playStory');
 const playStoryCardEl = document.getElementById('playStoryCard');
+const playFifthPhotoCardEl = document.getElementById('playFifthPhotoCard');
 const backToLibraryEl = document.getElementById('backToLibrary');
+const storyBrandEl = document.getElementById('storyBrand');
 const soundIntroEl = document.getElementById('soundIntro');
 const soundIntroBackdropEl = document.getElementById('soundIntroBackdrop');
 const enableStorySoundEl = document.getElementById('enableStorySound');
@@ -45,6 +46,7 @@ const soundToggleLabelEl = soundToggleEl.querySelector('.sound-toggle__label');
 let typingToken = 0;
 let finishTyping = null;
 let soundEnabled = false;
+let activeStory = 'grandma';
 let soundPromptTrigger = null;
 let busDepartureFadeTimer = null;
 let busDepartureFadeFrame = null;
@@ -91,6 +93,18 @@ const indoorHouseScenes = new Set([
   'mirrorBroken',
 ]);
 
+const indoorCryingScenes = new Set([
+  'wetCoat',
+  'coatLetter',
+  'hall',
+  'grandmaRoom',
+  'familyPhoto',
+  'cellar',
+  'scare',
+  'crossroad',
+  'secretRoom',
+]);
+
 function playFemaleCry(volume = 0.065) {
   if (!soundEnabled) return;
 
@@ -115,10 +129,10 @@ function stopFemaleCries() {
 }
 
 function syncIndoorCrying(sceneKey) {
-  const shouldRun = soundEnabled && indoorHouseScenes.has(sceneKey);
+  const shouldRun = soundEnabled && indoorCryingScenes.has(sceneKey);
 
   if (shouldRun && !femaleCryInterval) {
-    femaleCryInterval = setInterval(() => playFemaleCry(0.065), 20000);
+    femaleCryInterval = setInterval(() => playFemaleCry(0.065), 120000);
   } else if (!shouldRun && femaleCryInterval) {
     stopFemaleCries();
   }
@@ -308,7 +322,16 @@ function playAmbientSound() {
   });
 }
 
-const sceneOrder = ['storyPrelude', 'busRide', 'intro', 'forestRoad', 'loopRoad', 'approach', 'yard', 'shed', 'window', 'letter', 'letterReveal', 'porch', 'doorFalls', 'wetCoat', 'hall', 'grandmaRoom', 'cellar', 'crossroad'];
+const grandmaSceneOrder = ['storyPrelude', 'busRide', 'intro', 'forestRoad', 'loopRoad', 'approach', 'yard', 'shed', 'window', 'letter', 'letterReveal', 'porch', 'doorFalls', 'wetCoat', 'hall', 'grandmaRoom', 'cellar', 'crossroad'];
+const fifthPhotoSceneOrder = Array.from({ length: 15 }, (_, index) => `fifthPhoto${String(index + 1).padStart(2, '0')}`);
+const storySceneOrders = {
+  grandma: grandmaSceneOrder,
+  fifthPhoto: fifthPhotoSceneOrder,
+};
+const storyStartScenes = {
+  grandma: 'storyPrelude',
+  fifthPhoto: 'fifthPhoto01',
+};
 
 const sceneAssetExceptions = {
   arrival: 'arrival-v1.webp',
@@ -319,7 +342,11 @@ const sceneAssetExceptions = {
 };
 const preloadedSceneAssets = new Set();
 
-function getSceneAssetUrl(backdrop) {
+function getSceneAssetUrl(scene) {
+  if (scene.asset) return scene.asset;
+
+  const { backdrop } = scene;
+  if (backdrop === 'void') return null;
   const file = sceneAssetExceptions[backdrop] || `${backdrop}-v1.webp`;
   return `assets/scenes/${file}`;
 }
@@ -335,7 +362,8 @@ function preloadUpcomingScenes(sceneKey, scene) {
       const nextScene = scenes[nextSceneKey];
       if (!nextScene) return;
 
-      const url = getSceneAssetUrl(nextScene.backdrop);
+      const url = getSceneAssetUrl(nextScene);
+      if (!url) return;
       if (preloadedSceneAssets.has(url)) return;
 
       preloadedSceneAssets.add(url);
@@ -361,6 +389,7 @@ const scenes = {
     status: 'Некоторые вещи вспоминаются слишком поздно',
     text: [
       'В детстве ты проводил у бабушки каждое лето. Она записывала сны в толстый дневник, а нужные страницы перевязывала красной нитью. Над её кроватью висела маленькая деревянная иконка.',
+      'Ты отчётливо помнил ещё одну деталь: узкую дверь в конце коридора. Родители говорили, что этого не могло быть: за той стеной сразу начинался двор.',
       'Если просыпался ночью, она учила не отвечать на голос из коридора. Потом ты решил, что это была игра, и почти перестал ей звонить.',
       'Неделю назад из посёлка сообщили, что бабушку нашли в доме. Электричество отключили в тот же день. Тебе осталось забрать её вещи и дневник.'
     ],
@@ -382,12 +411,18 @@ const scenes = {
     backdrop: 'bus-stop',
     kicker: 'Пролог',
     title: 'Последний\nрейс',
-    status: 'Дальше только пешком',
-    text: [
-      'Дверь автобуса закрылась за спиной. Водитель не дождался, пока ты отойдёшь от дороги.',
-      'Красные огни исчезли между деревьями. Лес сомкнулся вокруг дороги, и стало тихо настолько, что ты услышал собственное дыхание.',
-      'Вдали стоял дом. Он казался пустым, если бы не едва заметный свет в одном окне.'
-    ],
+    status: () => state.previousScene === 'loopRoad' ? 'Дорога вернула тебя к началу' : 'Дальше только пешком',
+    text: () => state.previousScene === 'loopRoad'
+      ? [
+          'Ты повернул обратно и шёл, не сворачивая. Сначала дом остался за спиной. Потом между деревьями снова показался его свет.',
+          'Через несколько минут ты вышел к той же остановке. На мокрой земле всё ещё были видны следы, которые ты оставил, выйдя из автобуса.',
+          'Автобус не вернулся. Дом стоял на том же месте. Свет в окне не погас.'
+        ]
+      : [
+          'Дверь автобуса закрылась за спиной. Водитель не дождался, пока ты отойдёшь от дороги.',
+          'Красные огни исчезли между деревьями. Лес сомкнулся вокруг дороги, и стало тихо настолько, что ты услышал собственное дыхание.',
+          'Вдали стоял дом. Он казался пустым, если бы не едва заметный свет в одном окне.'
+        ],
     choices: [
       { title: 'Идти к дому', hint: 'Другой дороги здесь нет', next: 'approach' },
       { title: 'Идти от дома', hint: 'Попытаться выйти к большой дороге', next: 'forestRoad' },
@@ -807,7 +842,7 @@ const scenes = {
     text: [
       'Задняя дверь открылась от одного прикосновения. Доски, казавшиеся заколоченными, лежали на полу.',
       'На пороге лежала бабушкина деревянная иконка — та самая, что висела над её кроватью.',
-      'За спиной ничего не закрыло дверь.'
+      'На улице начали возвращаться настоящие воспоминания: рисунок на бабушкиной скатерти, трещина на её чашке, запах мокрых яблок в сенях. Ни одно из них не просило тебя обернуться.'
     ],
     choices: [
       {
@@ -886,6 +921,141 @@ const scenes = {
       'В окне бабушкиной комнаты больше не было света. Ни тени. Ни чужого голоса.',
       'Ты мысленно повторил последнюю строку дневника: «Чужой голос всегда ждёт ответа. Твоя мысль — нет». На этот раз слова не требовали ответа.'
     ],
+  },
+  fifthPhoto01: {
+    backdrop: 'fifth-photo-01',
+    asset: 'assets/scenes/fifth-photo/01-arrival-v1.png',
+    kicker: 'Сцена 1',
+    title: 'Приезд',
+    status: 'Новый дом',
+    text: ['Семья приехала к новому дому. Лера фотографирует родителей и Мишу перед тем, как они заходят внутрь.'],
+    choices: [{ title: 'Далее', hint: 'Зайти в дом', next: 'fifthPhoto02' }],
+  },
+  fifthPhoto02: {
+    backdrop: 'fifth-photo-02',
+    asset: 'assets/scenes/fifth-photo/02-lera-bedroom-v2.png',
+    kicker: 'Сцена 2',
+    title: 'Комната',
+    status: 'Первый вечер',
+    text: ['Лера разбирает вещи в своей новой комнате. Отец собирает мебель, родители разговаривают в коридоре.'],
+    choices: [{ title: 'Далее', hint: 'Спуститься к семье', next: 'fifthPhoto03' }],
+  },
+  fifthPhoto03: {
+    backdrop: 'fifth-photo-03',
+    asset: 'assets/scenes/fifth-photo/03-dinner-v1.png',
+    kicker: 'Сцена 3',
+    title: 'Ужин',
+    status: 'Все дома',
+    text: ['Семья ужинает после переезда. Миша молча отодвигает кусок хлеба к пустому краю стола.'],
+    choices: [{ title: 'Далее', hint: 'Закончить ужин', next: 'fifthPhoto04' }],
+  },
+  fifthPhoto04: {
+    backdrop: 'fifth-photo-04',
+    asset: 'assets/scenes/fifth-photo/04-empty-frame-v2.png',
+    kicker: 'Сцена 4',
+    title: 'Рамка',
+    status: 'Оставленные вещи',
+    text: ['Мать разбирает вещи прежних хозяев. Пустую деревянную рамку она оставляет на шкафу.'],
+    choices: [{ title: 'Далее', hint: 'Вернуться в комнату', next: 'fifthPhoto05' }],
+  },
+  fifthPhoto05: {
+    backdrop: 'fifth-photo-05',
+    asset: 'assets/scenes/fifth-photo/05-first-night-v2.png',
+    kicker: 'Сцена 5',
+    title: 'Первая ночь',
+    status: 'Дом затих',
+    text: ['Лера лежит в новой комнате и долго не может уснуть. Фотография остаётся забытой в телефоне.'],
+    choices: [{ title: 'Далее', hint: 'Дождаться утра', next: 'fifthPhoto06' }],
+  },
+  fifthPhoto06: {
+    backdrop: 'fifth-photo-06',
+    asset: 'assets/scenes/fifth-photo/06-first-morning-v1.png',
+    kicker: 'Сцена 6',
+    title: 'Утро',
+    status: 'Обычный дом',
+    text: ['Утром ночная тревога кажется глупой. Лера собирается и возвращается к домашним делам.'],
+    choices: [{ title: 'Далее', hint: 'Выйти во двор', next: 'fifthPhoto07' }],
+  },
+  fifthPhoto07: {
+    backdrop: 'fifth-photo-07',
+    asset: 'assets/scenes/fifth-photo/07-yard-chores-v1.png',
+    kicker: 'Сцена 7',
+    title: 'Во дворе',
+    status: 'Домашние дела',
+    text: ['Родители занимаются хозяйством. Миша катает машинку к закрытой калитке и ждёт, будто кто-то должен вернуть её обратно.'],
+    choices: [{ title: 'Далее', hint: 'Помочь матери', next: 'fifthPhoto08' }],
+  },
+  fifthPhoto08: {
+    backdrop: 'fifth-photo-08',
+    asset: 'assets/scenes/fifth-photo/08-wet-mitten-v1.png',
+    kicker: 'Сцена 8',
+    title: 'Варежка',
+    status: 'Чужая вещь',
+    text: ['Среди сухих вещей прежних хозяев Лера находит одну влажную детскую варежку. Миша говорит, что она не его.'],
+    choices: [{ title: 'Далее', hint: 'Убрать находку', next: 'fifthPhoto09' }],
+  },
+  fifthPhoto09: {
+    backdrop: 'fifth-photo-09',
+    asset: 'assets/scenes/fifth-photo/09-drawing-v1.png',
+    kicker: 'Сцена 9',
+    title: 'Рисунок',
+    status: 'Тихий вечер',
+    text: ['Миша рисует новый дом. Возле калитки он долго закрашивает одно место простым карандашом.'],
+    choices: [{ title: 'Далее', hint: 'Разойтись по комнатам', next: 'fifthPhoto10' }],
+  },
+  fifthPhoto10: {
+    backdrop: 'fifth-photo-10',
+    asset: 'assets/scenes/fifth-photo/10-corridor-toy-v1.png',
+    kicker: 'Сцена 10',
+    title: 'Коридор',
+    status: 'После полуночи',
+    text: ['Ночью Лера находит в пустом коридоре красную машинку Миши. Входная дверь остаётся закрытой.'],
+    choices: [{ title: 'Далее', hint: 'Вернуться в комнату', next: 'fifthPhoto11' }],
+  },
+  fifthPhoto11: {
+    backdrop: 'fifth-photo-11',
+    asset: 'assets/scenes/fifth-photo/11-family-leaves-v1.png',
+    kicker: 'Сцена 11',
+    title: 'Одна дома',
+    status: 'Следующий день',
+    text: ['Родители и Миша уезжают в магазин. Лера остаётся дома одна.'],
+    choices: [{ title: 'Далее', hint: 'Вернуться к книге', next: 'fifthPhoto12' }],
+  },
+  fifthPhoto12: {
+    backdrop: 'fifth-photo-12',
+    asset: 'assets/scenes/fifth-photo/12-reading-alone-v1.png',
+    kicker: 'Сцена 12',
+    title: 'Шаги',
+    status: 'Дом должен быть пуст',
+    text: ['Лера читает в гостиной. Из глубины дома доносятся несколько быстрых шагов.'],
+    choices: [{ title: 'Далее', hint: 'Проверить коридор', next: 'fifthPhoto13' }],
+  },
+  fifthPhoto13: {
+    backdrop: 'fifth-photo-13',
+    asset: 'assets/scenes/fifth-photo/13-corridor-glimpse-v1.png',
+    kicker: 'Сцена 13',
+    title: 'Миша',
+    status: 'Он уехал с родителями',
+    text: ['В дальнем конце коридора пробегает мальчик, похожий на Мишу. Он исчезает за дверью раньше, чем Лера успевает рассмотреть его.'],
+    choices: [{ title: 'Далее', hint: 'Пойти следом', next: 'fifthPhoto14' }],
+  },
+  fifthPhoto14: {
+    backdrop: 'fifth-photo-14',
+    asset: 'assets/scenes/fifth-photo/14-observer-drawing-v1.png',
+    kicker: 'Сцена 14',
+    title: 'Наблюдатель',
+    status: 'В комнате никого',
+    text: ['Комната оказывается пустой. На полу лежит рисунок Леры, читающей в гостиной, будто кто-то наблюдал за ней из коридора.'],
+    choices: [{ title: 'Далее', hint: 'Забрать рисунок', next: 'fifthPhoto15' }],
+  },
+  fifthPhoto15: {
+    backdrop: 'fifth-photo-15',
+    asset: 'assets/scenes/fifth-photo/15-family-returns-v1.png',
+    kicker: 'Сцена 15',
+    title: 'Возвращение',
+    status: 'Черновик заканчивается здесь',
+    text: ['Семья возвращается к вечеру. Миша спит на заднем сиденье, прижимая к себе красную машинку. Родители говорят, что он всё время был с ними.'],
+    choices: [{ title: 'К историям', hint: 'Продолжение будет позже', effect: () => openLibrary() }],
   },
 };
 
@@ -981,7 +1151,7 @@ function renderChoices(scene) {
     button.addEventListener('click', () => {
       if (isDisabled) return;
       if (choice.effect) choice.effect();
-      goTo(choice.next);
+      if (choice.next) goTo(choice.next);
     });
 
     choicesEl.appendChild(button);
@@ -1002,15 +1172,17 @@ function goTo(sceneKey) {
   document.body.classList.toggle('is-bad-ending-intro', sceneKey === 'endTrust');
 
   backdropEl.dataset.scene = scene.backdrop;
+  const sceneAssetUrl = getSceneAssetUrl(scene);
+  backdropEl.style.backgroundImage = sceneAssetUrl ? `url('${sceneAssetUrl}')` : 'none';
   kickerEl.textContent = scene.kicker;
   statusEl.textContent = typeof scene.status === 'function' ? scene.status() : scene.status;
   titleEl.innerHTML = scene.title.replace(/\n/g, '<br>');
 
-  const orderIndex = sceneOrder.indexOf(sceneKey);
-  const displayIndex = orderIndex >= 0 ? orderIndex : scene.ending ? sceneOrder.length : 0;
-  sceneIndexEl.textContent = String(displayIndex).padStart(2, '0');
-  progressBarEl.style.width = `${Math.max(7, ((displayIndex + 1) / (sceneOrder.length + 1)) * 100)}%`;
-  progressLabelEl.textContent = `${scene.kicker} · ${String(displayIndex).padStart(2, '0')}`;
+  const activeSceneOrder = storySceneOrders[activeStory];
+  const orderIndex = activeSceneOrder.indexOf(sceneKey);
+  const displayIndex = orderIndex >= 0 ? orderIndex : scene.ending ? activeSceneOrder.length : 0;
+  progressBarEl.style.width = `${Math.max(7, ((displayIndex + 1) / activeSceneOrder.length) * 100)}%`;
+  progressLabelEl.textContent = `${scene.kicker} · ${String(displayIndex + 1).padStart(2, '0')}`;
 
   if (!pickupEl.hidden && !['yard', 'letter'].includes(sceneKey)) {
     hidePickup();
@@ -1073,7 +1245,7 @@ function resetGame() {
   stopFemaleCries();
   renderInventory();
   hidePickup();
-  goTo('storyPrelude');
+  goTo(storyStartScenes[activeStory]);
 }
 
 function requestStoryStart(event) {
@@ -1095,7 +1267,10 @@ function dismissSoundPrompt() {
 
 function startStory(withSound = false) {
   closeSoundPrompt();
+  activeStory = 'grandma';
   document.body.classList.remove('is-library-open');
+  document.body.classList.remove('is-silent-story');
+  storyBrandEl.innerHTML = 'Назови меня <em>бабушкой</em>';
   soundEnabled = withSound;
   ambientSoundEl.currentTime = 0;
   renderSoundState();
@@ -1104,10 +1279,31 @@ function startStory(withSound = false) {
   textEl.focus({ preventScroll: true });
 }
 
+function startFifthPhotoStory() {
+  closeSoundPrompt();
+  activeStory = 'fifthPhoto';
+  document.body.classList.remove('is-library-open');
+  document.body.classList.add('is-silent-story');
+  storyBrandEl.innerHTML = 'Пятый на <em>фотографии</em>';
+  soundEnabled = false;
+  renderSoundState();
+  ambientSoundEl.pause();
+  ambientSoundEl.currentTime = 0;
+  stopBusDepartureSound();
+  stopOutdoorWind(true);
+  stopDisturbingSounds();
+  stopJumpscareSounds();
+  stopHouseCreaks();
+  stopFemaleCries();
+  resetGame();
+  textEl.focus({ preventScroll: true });
+}
+
 function openLibrary() {
   typingToken += 1;
   finishTyping = null;
   document.body.classList.remove('is-scare', 'is-bad-ending-intro', 'is-bad-ending-fade');
+  document.body.classList.remove('is-silent-story');
   document.body.classList.add('is-library-open');
   soundEnabled = false;
   renderSoundState();
@@ -1126,6 +1322,7 @@ function openLibrary() {
 restartEl.addEventListener('click', resetGame);
 playStoryEl.addEventListener('click', requestStoryStart);
 playStoryCardEl.addEventListener('click', requestStoryStart);
+playFifthPhotoCardEl.addEventListener('click', startFifthPhotoStory);
 enableStorySoundEl.addEventListener('click', () => startStory(true));
 startStoryMutedEl.addEventListener('click', () => startStory(false));
 soundIntroBackdropEl.addEventListener('click', dismissSoundPrompt);
