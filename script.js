@@ -323,7 +323,7 @@ function playAmbientSound() {
 }
 
 const grandmaSceneOrder = ['storyPrelude', 'busRide', 'intro', 'forestRoad', 'loopRoad', 'approach', 'yard', 'shed', 'window', 'letter', 'letterReveal', 'porch', 'doorFalls', 'wetCoat', 'hall', 'grandmaRoom', 'cellar', 'crossroad'];
-const fifthPhotoSceneOrder = Array.from({ length: 15 }, (_, index) => `fifthPhoto${String(index + 1).padStart(2, '0')}`);
+const fifthPhotoSceneOrder = Array.from({ length: 22 }, (_, index) => `fifthPhoto${String(index + 1).padStart(2, '0')}`);
 const storySceneOrders = {
   grandma: grandmaSceneOrder,
   fifthPhoto: fifthPhotoSceneOrder,
@@ -1014,7 +1014,7 @@ const scenes = {
   },
   fifthPhoto11: {
     backdrop: 'fifth-photo-11',
-    asset: 'assets/scenes/fifth-photo/11-family-leaves-v1.png',
+    asset: 'assets/scenes/fifth-photo/11-family-leaves-v3.png',
     kicker: 'Сцена 11',
     title: 'Одна дома',
     status: 'Следующий день',
@@ -1050,11 +1050,74 @@ const scenes = {
   },
   fifthPhoto15: {
     backdrop: 'fifth-photo-15',
-    asset: 'assets/scenes/fifth-photo/15-family-returns-v1.png',
+    asset: 'assets/scenes/fifth-photo/15-family-returns-v2.png',
     kicker: 'Сцена 15',
     title: 'Возвращение',
-    status: 'Черновик заканчивается здесь',
-    text: ['Семья возвращается к вечеру. Миша спит на заднем сиденье, прижимая к себе красную машинку. Родители говорят, что он всё время был с ними.'],
+    status: 'Семья снова дома',
+    text: ['Семья возвращается к вечеру. Миша уже вышел из машины и стоит рядом с родителями.'],
+    choices: [{ title: 'Далее', hint: 'Вернуться в дом', next: 'fifthPhoto16' }],
+  },
+  fifthPhoto16: {
+    backdrop: 'fifth-photo-16',
+    asset: 'assets/scenes/fifth-photo/16-last-evening-v1.png',
+    kicker: 'Сцена 16',
+    title: 'Последний вечер',
+    status: 'Миша ещё здесь',
+    text: ['Миша играет с красной машинкой. Лера показывает ему найденный рисунок.'],
+    choices: [{ title: 'Далее', hint: 'Дождаться утра', next: 'fifthPhoto17' }],
+  },
+  fifthPhoto17: {
+    backdrop: 'fifth-photo-17',
+    asset: 'assets/scenes/fifth-photo/17-empty-bed-v1.png',
+    kicker: 'Сцена 17',
+    title: 'Пустая кровать',
+    status: 'Утро',
+    text: ['Миши нет в комнате. На подушке осталась его мокрая красная машинка.'],
+    choices: [{ title: 'Далее', hint: 'Позвать родителей', next: 'fifthPhoto18' }],
+  },
+  fifthPhoto18: {
+    backdrop: 'fifth-photo-18',
+    asset: 'assets/scenes/fifth-photo/18-parents-forgot-v3.png',
+    kicker: 'Сцена 18',
+    title: 'Разговор',
+    status: 'Они не понимают',
+    text: ['Родители спокойно отвечают, что никакого Миши никогда не было.'],
+    choices: [{ title: 'Далее', hint: 'Проверить телефон', next: 'fifthPhoto19' }],
+  },
+  fifthPhoto19: {
+    backdrop: 'fifth-photo-19',
+    asset: 'assets/scenes/fifth-photo/19-phone-photo-v1.png',
+    kicker: 'Сцена 19',
+    title: 'Снимок',
+    status: 'Его больше нет',
+    text: ['Лера открывает фотографию в телефоне. На снимке остались только родители.'],
+    choices: [{ title: 'Далее', hint: 'Найти семейную фотографию', next: 'fifthPhoto20' }],
+  },
+  fifthPhoto20: {
+    backdrop: 'fifth-photo-20',
+    asset: 'assets/scenes/fifth-photo/20-birthday-empty-chair-v2.png',
+    kicker: 'Сцена 20',
+    title: 'Пустой стул',
+    status: 'День рождения',
+    text: ['На семейной фотографии возле торта стоит пустой стул. Никто не помнит, для кого он был поставлен.'],
+    choices: [{ title: 'Далее', hint: 'Спуститься к ужину', next: 'fifthPhoto21' }],
+  },
+  fifthPhoto21: {
+    backdrop: 'fifth-photo-21',
+    asset: 'assets/scenes/fifth-photo/21-dinner-without-misha-v2.png',
+    kicker: 'Сцена 21',
+    title: 'Ужин',
+    status: 'Теперь их трое',
+    text: ['Родители спокойно ужинают. Лера не притрагивается к еде.'],
+    choices: [{ title: 'Далее', hint: 'Вернуться в комнату', next: 'fifthPhoto22' }],
+  },
+  fifthPhoto22: {
+    backdrop: 'fifth-photo-22',
+    asset: 'assets/scenes/fifth-photo/22-dark-bedroom-v1.png',
+    kicker: 'Сцена 22',
+    title: 'Ночь',
+    status: 'Дом снова тих',
+    text: ['Ночью дом кажется темнее. В коридоре ничего не происходит.'],
     choices: [{ title: 'К историям', hint: 'Продолжение будет позже', effect: () => openLibrary() }],
   },
 };
